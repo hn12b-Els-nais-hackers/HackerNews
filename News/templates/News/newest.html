@@ -1,18 +1,87 @@
-<!-- News/templates/News/newest.html -->
 {% extends 'News/base.html' %}
+{% load static %}
 
-{% block title %}Newest Submissions{% endblock %}
+{% block title %}New Links | Hacker News{% endblock %}
 
 {% block content %}
-    <h2>Newest Submissions</h2>
-    <ul>
-        {% for submission in submissions %}
-            <li>
-                <a href="{{ submission.url }}">{{ submission.title }}</a> - submitted at {{ submission.created_at }}
-                <span>(submitted by {{ submission.user.username }})</span>
-            </li>
-        {% empty %}
-            <li>No submissions available.</li>
-        {% endfor %}
-    </ul>
+<center>
+    <table id="hnmain" border="0" cellpadding="0" cellspacing="0" width="85%" bgcolor="#f6f6ef">
+        <tr>
+            <td bgcolor="#ff6600">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="padding:2px">
+                    <tr>
+                        <td style="line-height:12pt; height:10px;">
+                            <span class="pagetop">
+                                <b class="hnname">
+                                    <a href="{% url 'news' %}">Hacker News</a>
+                                </b>
+                                <span class="topsel">
+                                    <a href="{% url 'newest' %}">new</a>
+                                </span>
+                                | <a href="{% url 'submit' %}" rel="nofollow">submit</a>
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr id="pagespace" title="New Links" style="height:10px"></tr>
+        <tr>
+            <td>
+                <table border="0" cellpadding="0" cellspacing="0">
+                    {% for submission in submissions %}
+                    <tr class='athing' id='{{ submission.id }}'>
+                        <td align="right" valign="top" class="title">
+                            <span class="rank">{{ forloop.counter }}.</span>
+                        </td>
+                        <td class="title">
+                            <span class="titleline">
+                                <a href="{{ submission.url }}" rel="nofollow">{{ submission.title }}</a>
+                                <span class="sitebit comhead">
+                                    ({{ submission.domain }})
+                                </span>
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"></td>
+                        <td class="subtext">
+                            <span class="subline">
+                                <span class="score" id="score_{{ submission.id }}">{{ submission.points }} points</span>
+                                <span class="age" title="{{ submission.created_at|date:'c' }}">
+                                    {{ submission.created_at|timesince }} ago
+                                </span>
+                                <span id="unv_{{ submission.id }}"></span>
+                                | hide
+                                | {{ submission.comment_count }} &nbsp;comments
+                            </span>
+                        </td>
+                    </tr>
+                    <tr class="spacer" style="height:5px"></tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">No submissions available.</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <img src="{% static 'News/s.gif' %}" height="10" width="0">
+                <table width="100%" cellspacing="0" cellpadding="1">
+                    <tr>
+                        <td bgcolor="#ff6600"></td>
+                    </tr>
+                </table>
+                <br>
+                <center>
+                    <form method="get" action="//hn.algolia.com/">
+                        Search: <input type="text" name="q" size="17" autocorrect="off" spellcheck="false" autocapitalize="off" autocomplete="off">
+                    </form>
+                </center>
+            </td>
+        </tr>
+    </table>
+</center>
 {% endblock %}
