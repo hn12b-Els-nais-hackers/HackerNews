@@ -1,0 +1,18 @@
+<!-- News/templates/News/news.html -->
+{% extends 'News/base.html' %}
+
+{% block title %}News{% endblock %}
+
+{% block content %}
+    <h2>Latest Submissions</h2>
+    <ul>
+        {% for submission in submissions %}
+            <li>
+                <a href="{{ submission.url }}">{{ submission.title }}</a> - {{ submission.points }} points
+                <span>(submitted by {{ submission.user.username }})</span>
+            </li>
+        {% empty %}
+            <li>No submissions available.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

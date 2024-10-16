@@ -1,0 +1,34 @@
+<!-- News/templates/News/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Hacker News{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'News/styles.css' %}">  <!-- Link to your CSS file -->
+</head>
+<body>
+    <header>
+        <h1>Hacker News</h1>
+        <nav>
+            <ul>
+                <li><a href="{% url 'news' %}">News</a></li>
+                <li><a href="{% url 'newest' %}">Newest</a></li>
+                <li><a href="{% url 'submit' %}">Submit</a></li>
+                <li><a href="#">About</a></li>  <!-- Placeholder for an About page -->
+                <li><a href="#">Contact</a></li>  <!-- Placeholder for a Contact page -->
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>© 2024 Hacker News</p>
+    </footer>
+</body>
+</html>
