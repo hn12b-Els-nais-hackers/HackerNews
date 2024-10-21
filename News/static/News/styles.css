@@ -176,3 +176,48 @@ and (max-width : 750px) {
 @media only screen and (min-width : 1260px) and (max-width : 1349px) {
   .comment { max-width: 1130px; overflow: hidden }
 }
+
+/* News/static/News/styles.css */
+
+/* General body styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f6f6ef;
+}
+
+/* Footer container for layout */
+.footer-container {
+    text-align: center;  /* Center the entire footer */
+    padding: 20px;
+    background-color: #f6f6ef;
+    border-top: 1px solid #ff6600;
+    margin-top: 20px;
+}
+
+/* Footer links styling */
+.footer-links a {
+    color: #828282;  /* Gray color similar to Hacker News */
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+.footer-links a:hover {
+    text-decoration: underline;  /* Underline on hover */
+}
+
+/* Footer search box styling */
+.footer-search input[type="text"] {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+footer {
+    font-size: 12px;  /* Small font size like HN */
+}
+
+footer form {
+    margin-top: 10px;
+}

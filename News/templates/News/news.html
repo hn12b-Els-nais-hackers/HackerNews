@@ -4,74 +4,40 @@
 {% block title %}News{% endblock %}
 
 {% block content %}
-<center>
-    <table id="hnmain" border="0" cellpadding="0" cellspacing="0" width="85%" bgcolor="#f6f6ef">
-        <tr>
-            <td bgcolor="#ff6600">
-                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="padding:2px">
-                    <tr>
-                        <td style = "width:18px;padding-right:4px">
-                            <a href ="https://news.ycombinator.com">
-                                <img src="https://news.ycombinator.com/y18.svg" width="18" style="border: 1px white solid; display:block">
-                            </a>
-                        </td>
-                        <td style="line-height:12pt; height:10px;">
-                            <span class="pagetop">
-                                <b class="hnname">
-                                    <a href="{% url 'news' %}">Hacker News</a>
-                                </b>
-                                <a href="{% url 'newest' %}">new</a>
-                                | <a href="{% url 'submit' %}" rel="nofollow">submit</a>
-                            </span>
-                        </td>
-                        <td style="text-align:right;padding-right:4px;">
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-        <tr id="pagespace" title="" style="height:10px"></tr>
-        <tr>
-            <td>
-                <table border="0" cellpadding="0" cellspacing="0">
-                    {% for submission in submissions %}
-                    <tr class='athing' id='{{ submission.id }}'>
-                        <td align="right" valign="top" class="title">
-                            <span class="rank">{{ forloop.counter }}.</span>
-                        </td>
-                        <td class="title">
-                            <span class="titleline">
-                                <a href="{{ submission.url }}">{{ submission.title }}</a>
-                                <span class="sitebit comhead">
-                                    ({{ submission.domain }})
+    <center>
+        <table border="0" cellpadding="0" cellspacing="0" width="85%" bgcolor="#f6f6ef">
+            <tr>
+                <td>
+                    <table border="0" cellpadding="0" cellspacing="0">
+                        {% for submission in submissions %}
+                        <tr class='athing' id='{{ submission.id }}'>
+                            <td align="right" valign="top" class="title">
+                                <span class="rank">{{ forloop.counter }}.</span>
+                            </td>
+                            <td class="title">
+                                <span class="titleline">
+                                    <a href="{{ submission.url }}">{{ submission.title }}</a>
+                                    <span class="sitebit comhead">({{ submission.domain }})</span>
                                 </span>
-                            </span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2"></td>
-                        <td class="subtext">
-                            <span class="subline">
-                                <span class="score" id="score_{{ submission.id }}">{{ submission.points }} points</span>
-                                by {{ submission.user.username }}
-                                <span class="age" title="{{ submission.created_at|date:'c' }}">
-                                    {{ submission.created_at|timesince }} ago
-                                </span>
-                                <span id="unv_{{ submission.id }}"></span>
-                                | hide
-                                | {{ submission.comment_count }} &nbsp;comments
-                            </span>
-                        </td>
-                    </tr>
-                    <tr class="spacer" style="height:5px"></tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="3">No submissions available.</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </td>
-        </tr>
-    </table>
-</center>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"></td>
+                            <td class="subtext">
+                                <span class="score">{{ submission.points }} points</span> by {{ submission.user.username }}
+                                <span class="age">{{ submission.created_at|timesince }} ago</span>
+                                | {{ submission.comment_count }} comments
+                            </td>
+                        </tr>
+                        <tr class="spacer" style="height:5px"></tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3">No submissions available.</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </center>
 {% endblock %}

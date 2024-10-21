@@ -31,5 +31,16 @@ def submit(request):
         form = SubmissionForm()
     return render(request, 'News/submit.html', {'form': form})
 
-def about(request):
-    return render(request, 'News/about.html')
+def ask(request):
+    return render(request, 'News/ask.html')
+
+def comments(request):
+    return render(request, 'News/comments.html')
+
+def login(request):
+    return render(request, 'News/login.html')
+
+def threads(request):
+    return render(request, 'News/threads.html')
+
+
