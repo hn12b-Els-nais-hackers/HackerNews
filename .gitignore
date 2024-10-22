@@ -1,2 +1,4 @@
 .env
 __pycache__/
+News/__pycache__
+HackerNews/__pycache__
