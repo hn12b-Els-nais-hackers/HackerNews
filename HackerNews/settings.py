@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,13 +26,16 @@ SECRET_KEY = 'django-insecure-ke=1-=z93(bu_4gf7fzf98&dhn%d04m8dut!41$f3n^u%@id#h
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'https://0256-84-78-248-85.ngrok-free.app']
+SITE_ID = 1
 
 
 # Application definition
 
 INSTALLED_APPS = [
     'News',
+    'django.contrib.sites',
+    'social_django',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,7 +44,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.google.GoogleOAuth2',  # for Google
+    'django.contrib.auth.backends.ModelBackend',  # to use Django's built-in user auth
+)
+
+
+
 MIDDLEWARE = [
+    'social_django.middleware.SocialAuthExceptionMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -50,7 +62,40 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# Google OAuth keys from the Google Developer Console
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '971326311730-3nv4n4d8gm5i8jlbt2jqof9n08gqvmgc.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+
+# Set login and logout URLs
+LOGIN_URL = 'login'
+LOGOUT_URL = 'logout'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
+# Add Social Auth pipeline to create a user if it doesn't exist
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.auth_allowed',
+    'social_core.pipeline.social_auth.social_user',
+    'social_core.pipeline.user.get_username',
+    'social_core.pipeline.user.create_user',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'News.pipeline.create_user_profile',
+    'social_core.pipeline.user.user_details',
+)
+
+# Store social auth data in the session
+SOCIAL_AUTH_SESSION_EXPIRATION = False
+
+# URL used to complete authentication
+SOCIAL_AUTH_URL_NAMESPACE = 'social'
+
 ROOT_URLCONF = 'HackerNews.urls'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'News', 'media')
 
 TEMPLATES = [
     {
