@@ -51,3 +51,7 @@ class UserProfile(models.Model):
         help_text='Specific permissions for this user.',
         verbose_name='user permissions',
     )
+    
+class Comment(models.Model):
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)

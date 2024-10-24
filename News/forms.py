@@ -2,6 +2,7 @@ from django import forms
 from .models import Submission
 from django.contrib.auth.forms import UserChangeForm
 from .models import UserProfile
+from .models import Submission, Comment
 
 class SubmissionForm(forms.ModelForm):
     class Meta:
@@ -40,3 +41,9 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ('avatar', 'banner', 'about')
+        
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['text']

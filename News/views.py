@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Submission, UserProfile
 from .forms import SubmissionForm
+from django.shortcuts import render, redirect
+from .models import Submission, Comment
+from .forms import SubmissionForm, CommentForm
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -45,6 +48,11 @@ def login(request):
 def threads(request):
     return render(request, 'News/threads.html')
 
+def add_comment(request):
+    form = CommentForm(request.POST)
+    if form.is_valid():
+        form.save()
+    return redirect('News/comments.html')
 
 @login_required
 def profile_view(request, username):

@@ -14,6 +14,8 @@ urlpatterns = [
     path('threads/', views.threads, name='threads'),
     path('login/', auth_views.LoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('add_comment/', views.add_comment, name='add_comment'),
     # Página de perfil del usuario
     path('profile/<str:username>/', views.profile_view, name='profile'),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  
+
