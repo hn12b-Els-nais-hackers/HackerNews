@@ -1,8 +1,10 @@
-from django.shortcuts import render, redirect
-from .models import Submission
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Submission, UserProfile
 from .forms import SubmissionForm
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from .forms import ProfileForm 
 
 # Pàgina principal: mostra les submissions ordenades per punts
 def news(request):
@@ -25,7 +27,7 @@ def submit(request):
             #submission.author = request.user  # Suposant que tens l'usuari loguejat
             submission.user = User.objects.get(username='default_user')
             submission.save()
-            #form.save()
+            form.save()
             return redirect('newest')  # Redirigeix a la pàgina newest després de crear la submission
     else:
         form = SubmissionForm()
@@ -42,5 +44,24 @@ def login(request):
 
 def threads(request):
     return render(request, 'News/threads.html')
+
+
+@login_required
+def profile_view(request, username):
+    # Fetch the User instance using the provided username
+    user = get_object_or_404(User, username=username)
+    
+    # Now fetch the UserProfile using the User instance
+    user_profile = get_object_or_404(UserProfile, user_id=user.id)
+
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, request.FILES, instance=user_profile)
+        if form.is_valid():
+            form.save()
+            return redirect('profile', username=user.username)  # Redirect to the profile page after saving
+    else:
+        form = ProfileForm(instance=user_profile)
+
+    return render(request, 'News/profile.html', {'form': form, 'user_profile': user_profile, 'user': user})
 
 
