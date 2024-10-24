@@ -4,5 +4,19 @@
 
 {% block content %}
     <h2>Comments</h2>
-    <p>This is a simple implementation of a comments aggregation site similar to Hacker News.</p>
+    <p></p>
+
+    <!-- Display the submission -->
+    <div id="submission">
+        <!-- Aquí puedes agregar el contenido de la submission -->
+    </div>
+
+    <!-- Formulario para agregar un comentario -->
+    <form method="post" action="{% url 'add_comment' %}">
+        {% csrf_token %}
+        <textarea name="comment" ></textarea>
+        <button type="submit">Add Comment</button>
+    </form>
+
+    <!-- Aquí puedes agregar la lógica para mostrar los comentarios existentes -->
 {% endblock %}

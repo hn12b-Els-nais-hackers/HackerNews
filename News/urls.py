@@ -10,4 +10,5 @@ urlpatterns = [
     path('comments/', views.comments, name='comments'), 
     path('login/', views.login, name='login'),   
     path('threads/', views.threads, name='threads'), 
+    path('add_comment/', views.add_comment, name='add_comment'),
 ]

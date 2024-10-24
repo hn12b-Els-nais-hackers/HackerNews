@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
-from .models import Submission
-from .forms import SubmissionForm
+from .models import Submission, Comment
+from .forms import SubmissionForm, CommentForm
 from django.utils import timezone
 from django.contrib.auth.models import User
 
@@ -43,4 +43,9 @@ def login(request):
 def threads(request):
     return render(request, 'News/threads.html')
 
+def add_comment(request):
+    form = CommentForm(request.POST)
+    if form.is_valid():
+        form.save()
+    return redirect('News/comments.html')
 
