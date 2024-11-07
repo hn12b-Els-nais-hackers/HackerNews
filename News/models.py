@@ -26,6 +26,7 @@ class Submission(models.Model):
     submission_type = models.CharField(max_length=10, choices=SUBMISSION_TYPES, default='url')
     created_at = models.DateTimeField(auto_now_add=True)
     voters = models.ManyToManyField(User, related_name='voted_submissions', blank=True)
+    hidden_by = models.ManyToManyField(User, related_name='hidden_submissions', blank=True)
 
     def __str__(self):
         return self.title

@@ -12,11 +12,15 @@ from .forms import ProfileForm
 # Pàgina principal: mostra les submissions ordenades per punts
 def news(request):
     submissions = Submission.objects.all().order_by('-points')  # Ordena per punts
+    if request.user.is_authenticated:
+        submissions = submissions.exclude(hidden_by=request.user)
     return render(request, 'News/news.html', {'submissions': submissions})
 
 # Pàgina de submissions més recents: mostra les submissions ordenades per data de creació
 def newest(request):
     submissions = Submission.objects.all().order_by('-created_at')  # Ordena per més recent
+    if request.user.is_authenticated:
+        submissions = submissions.exclude(hidden_by=request.user)
     return render(request, 'News/newest.html', {'submissions': submissions})
 
 # Pàgina de submit: permet a l'usuari crear una nova submission
@@ -90,4 +94,24 @@ def unvote_submission(request, submission_id):
         submission.voters.remove(request.user)
         submission.save()
     return redirect('newest')
+
+@login_required
+def hide_submission(request, submission_id):
+    submission = get_object_or_404(Submission, id=submission_id)
+    submission.hidden_by.add(request.user)
+    next_page = request.GET.get('next', 'news')
+    return redirect(next_page)
+
+@login_required
+def hidden_submissions(request):
+    submissions = Submission.objects.filter(hidden_by=request.user).order_by('-created_at')
+    return render(request, 'News/hidden_submissions.html', {'submissions': submissions})
+
+@login_required
+def unhide_submission(request, submission_id):
+    submission = get_object_or_404(Submission, id=submission_id)
+    if request.user in submission.hidden_by.all():
+        submission.hidden_by.remove(request.user)
+        submission.save()
+    return redirect('hidden_submissions')
     

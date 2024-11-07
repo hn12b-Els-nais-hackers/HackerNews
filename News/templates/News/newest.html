@@ -39,6 +39,7 @@
                                     | <a href="{% url 'unvote_submission' submission.id %}">unvote</a>
                                 {% endif %}
                                 | {{ submission.comment_count }} comments
+                                | <a href="{% url 'hide_submission' submission.id %}?next=newest">hide</a>
                             </td>
                         </tr>
                         <tr class="spacer" style="height:5px"></tr>
