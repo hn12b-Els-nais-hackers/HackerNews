@@ -25,9 +25,14 @@ class Submission(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     submission_type = models.CharField(max_length=10, choices=SUBMISSION_TYPES, default='url')
     created_at = models.DateTimeField(auto_now_add=True)
+    voters = models.ManyToManyField(User, related_name='voted_submissions', blank=True)
 
     def __str__(self):
         return self.title
+
+    def upvote(self):
+        self.points += 1
+        self.save()
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

@@ -17,5 +17,6 @@ urlpatterns = [
     path('add_comment/', views.add_comment, name='add_comment'),
     # Página de perfil del usuario
     path('profile/<str:username>/', views.profile_view, name='profile'),
+    path('upvote/<int:submission_id>/', views.upvote_submission, name='upvote_submission'),
+    path('unvote/<int:submission_id>/', views.unvote_submission, name='unvote_submission'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  
-

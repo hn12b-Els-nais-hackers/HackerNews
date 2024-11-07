@@ -72,4 +72,22 @@ def profile_view(request, username):
 
     return render(request, 'News/profile.html', {'form': form, 'user_profile': user_profile, 'user': user})
 
+@login_required
+def upvote_submission(request, submission_id):
+    submission = get_object_or_404(Submission, id=submission_id)
+    if request.user not in submission.voters.all():
+        submission.points += 1
+        submission.voters.add(request.user)
+        submission.save()
+    next_page = request.GET.get('next', 'newest')
+    return redirect(next_page)
 
+@login_required
+def unvote_submission(request, submission_id):
+    submission = get_object_or_404(Submission, id=submission_id)
+    if request.user in submission.voters.all():
+        submission.points -= 1
+        submission.voters.remove(request.user)
+        submission.save()
+    return redirect('newest')
+    
