@@ -25,6 +25,7 @@ class Submission(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     submission_type = models.CharField(max_length=10, choices=SUBMISSION_TYPES, default='url')
     created_at = models.DateTimeField(auto_now_add=True)
+    comments = models.ManyToManyField('Comment', related_name='submissions', blank=True)
 
     def __str__(self):
         return self.title

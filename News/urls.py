@@ -15,6 +15,7 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('add_comment/', views.add_comment, name='add_comment'),
+    path('submission/<int:submission_id>/comments/', views.submission_comments, name='submission_comments'),
     # Página de perfil del usuario
     path('profile/<str:username>/', views.profile_view, name='profile'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  

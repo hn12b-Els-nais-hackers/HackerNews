@@ -26,7 +26,7 @@
                             <td class="subtext">
                                 <span class="score">{{ submission.points }} points</span> by {{ submission.user.username }}
                                 <span class="age">{{ submission.created_at|timesince }} ago</span>
-                                | {{ submission.comment_count }} comments
+                                | <a href="{% url 'submission_comments' submission.id %}">{{ submission.comment_count }} comments</a>
                             </td>
                         </tr>
                         <tr class="spacer" style="height:5px"></tr>

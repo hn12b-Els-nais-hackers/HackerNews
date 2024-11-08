@@ -56,7 +56,24 @@ def add_comment(request):
 
 def all_comments(request):
     comments = Comment.objects.all()
-    return render(request, 'news/comments.html', {'comments': comments})
+    return render(request, 'News/comments.html', {'comments': comments})
+
+def submission_comments(request, submission_id):
+    submission = get_object_or_404(Submission, id=submission_id)
+    comments = submission.comments.all()
+    
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.submission = submission
+            comment.save()
+            return redirect('submission_comments', submission_id=submission.id)
+    else:
+        form = CommentForm()
+    
+    return render(request, 'news/submission_comments.html', {'submission': submission, 'comments': comments, 'form': form})
+
 
 @login_required
 def profile_view(request, username):
@@ -75,5 +92,4 @@ def profile_view(request, username):
         form = ProfileForm(instance=user_profile)
 
     return render(request, 'News/profile.html', {'form': form, 'user_profile': user_profile, 'user': user})
-
 
