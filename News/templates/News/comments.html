@@ -12,11 +12,18 @@
     </div>
 
     <!-- Formulario para agregar un comentario -->
-    <form method="post" action="{% url 'add_comment' %}">
+    <!--<form method="post" action="{% url 'add_comment' %}">
         {% csrf_token %}
         <textarea name="comment" ></textarea>
-        <button type="submit">Add Comment</button>
-    </form>
+        <button type="submit">add Comment</button>
+    </form>-->
+
+    <!-- Mostrar los comentarios existentes -->
+<ul>
+    {% for comment in comments %}
+        <li>{{ comment.text }} (on {{ comment.submission.title }})</li>
+    {% endfor %}
+</ul>
 
     <!-- Aquí puedes agregar la lógica para mostrar los comentarios existentes -->
 {% endblock %}

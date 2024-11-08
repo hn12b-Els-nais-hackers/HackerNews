@@ -54,6 +54,10 @@ def add_comment(request):
         form.save()
     return redirect('News/comments.html')
 
+def all_comments(request):
+    comments = Comment.objects.all()
+    return render(request, 'news/comments.html', {'comments': comments})
+
 @login_required
 def profile_view(request, username):
     # Fetch the User instance using the provided username
