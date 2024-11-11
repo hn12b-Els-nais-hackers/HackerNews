@@ -11,7 +11,9 @@
         <td class="title">
             <span class="titleline">
                 <a href="{{ submission.url }}">{{ submission.title }}</a>
-                <span class="sitebit comhead">({{ submission.domain }})</span>
+                {% if submission.url %}
+                    <span class="sitebit comhead">({{ submission.url }})</span>
+                {% endif %}
             </span>
         </td>
     </tr>
@@ -20,20 +22,23 @@
         <td class="subtext">
             <span class="score">{{ submission.points }} points</span> by {{ submission.user.username }}
             <span class="age">{{ submission.created_at|timesince }} ago</span>
-            | <a href="{% url 'submission_comments' submission.id %}">{{ submission.comment_count }} comments</a>
+            | <a href="{% url 'submission_comments' submission.id %}">
+                {{ submission.submission_comments.count }} comments</a>
         </td>
     </tr>
 </table>
 
-<form method="post">
+<form method="post" action="{% url 'create_comment' submission.id %}">
     {% csrf_token %}
-    {{ form.as_p }}
+    <textarea name="text"></textarea>
     <button type="submit">add comment</button>
 </form>
 
 <ul>
-    {% for comment in comments %}
-        <li>{{ comment.text }} ({{ comment.created_at|timesince }} ago)</li>
+    {% for comment in submission.submission_comments.all %}
+        {% if not comment.parent %}
+            {% include 'news/comment_item.html' with comment=comment %}
+        {% endif %}
     {% endfor %}
 </ul>
 {% endblock %}

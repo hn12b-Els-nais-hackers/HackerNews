@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% for comment in comments %}
+        {% include 'comments/comment_item.html' with comment=comment %}
+    {% endfor %}
+{% endblock %}

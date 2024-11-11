@@ -4,26 +4,43 @@
 
 {% block content %}
     <h2>Comments</h2>
-    <p></p>
-
-    <!-- Display the submission -->
-    <div id="submission">
-        <!-- Aquí puedes agregar el contenido de la submission -->
-    </div>
-
-    <!-- Formulario para agregar un comentario -->
-    <!--<form method="post" action="{% url 'add_comment' %}">
-        {% csrf_token %}
-        <textarea name="comment" ></textarea>
-        <button type="submit">add Comment</button>
-    </form>-->
-
-    <!-- Mostrar los comentarios existentes -->
-<ul>
-    {% for comment in comments %}
-        <li>{{ comment.text }} (on {{ comment.submission.title }})</li>
-    {% endfor %}
-</ul>
-
-    <!-- Aquí puedes agregar la lógica para mostrar los comentarios existentes -->
+    <!-- Mostrar todos los comentarios -->
+    <table class="comment-table" border="0">
+        {% for comment in comments %}
+            <tr class="athing comtr">
+                <td>
+                    <div class="comment">
+                        <span class="commtext">
+                            {{ comment.text }}
+                        </span>
+                        <div class="comment-meta">
+                            <span class="comhead">
+                                {% if comment.author %}
+                                    <a href="{% url 'profile' comment.author.username %}" class="hnuser">
+                                        {{ comment.author.username }}
+                                    </a>
+                                {% else %}
+                                    <span class="hnuser">anonymous</span>
+                                {% endif %}
+                                <span class="age" title="{{ comment.created_at }}">
+                                    {{ comment.created_at|timesince }} ago
+                                </span>
+                                {% if comment.submission %}
+                                    on: 
+                                    <a href="{% url 'submission_comments' comment.submission.id %}">
+                                        {{ comment.submission.title }}
+                                    </a>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    <br><br>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td>No comments yet.</td>
+            </tr>
+        {% endfor %}
+    </table>
 {% endblock %}

@@ -1,0 +1,20 @@
+<div class="comment">
+    <p>{{ comment.text }}</p>
+    <small>
+        Por: {{ comment.author.username|default:"anónimo" }} - 
+        {{ comment.created_at|timesince }} ago
+    </small>
+    
+    {% if user.is_authenticated %}
+        <form method="post" action="{% url 'create_comment' submission.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="parent_id" value="{{ comment.id }}">
+            <textarea name="text"></textarea>
+            <button type="submit">Responder</button>
+        </form>
+    {% endif %}
+
+    {% for reply in comment.replies.all %}
+        {% include 'news/comment_item.html' with comment=reply %}
+    {% endfor %}
+</div>
