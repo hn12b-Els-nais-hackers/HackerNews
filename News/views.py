@@ -11,7 +11,7 @@ from .forms import ProfileForm
 def news(request):
     submissions = Submission.objects.all().order_by('-points')  # Ordena per punts
     if request.user.is_authenticated:
-        submissions = submissions.exclude(hidden_by=request.user)
+        submissions = submissions.exclude(hidden_by=request.user).order_by('-points')
     return render(request, 'News/news.html', {'submissions': submissions})
 
 # Pàgina de submissions més recents: mostra les submissions ordenades per data de creació
@@ -22,6 +22,7 @@ def newest(request):
     return render(request, 'News/newest.html', {'submissions': submissions})
 
 # Pàgina de submit: permet a l'usuari crear una nova submission
+@login_required  
 def submit(request):
     if request.method == 'POST':
         form = SubmissionForm(request.POST)
@@ -30,7 +31,7 @@ def submit(request):
             submission.created_at = timezone.now()  # Assigna la data actual
             submission.points = 0  # Inicialment 0 punts
             #submission.author = request.user  # Suposant que tens l'usuari loguejat
-            submission.user = User.objects.get(username='default_user')
+            submission.user = request.user
             submission.save()
             form.save()
             return redirect('newest')  # Redirigeix a la pàgina newest després de crear la submission
@@ -69,6 +70,22 @@ def delete_submission(request, submission_id):
         return redirect('newest')  # Redirigeix a la vista "newest" després d'eliminar
 
     return render(request, 'News/delete_submission.html', {'submission': submission})
+
+# Pàgina de perfil de l'usuari: mostra les submissions i comentaris de l'usuari
+def user_profile(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    profile = UserProfile.objects.get(user=user)
+    posts = Submission.objects.filter(user=user).order_by('-created_at')
+    comments = Comment.objects.filter(author=user).order_by('-created_at')
+    
+    context = {
+        'profile_user': user,
+        'profile': profile,
+        'posts': posts,
+        'comments': comments,
+    }
+    
+    return render(request, 'News/user_profile.html', context)
 
 def ask(request):
     return render(request, 'News/ask.html')
