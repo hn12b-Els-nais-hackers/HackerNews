@@ -45,4 +45,18 @@
         </tr>
     </table>
 </center>
+
+<h2>Hidden Comments</h2>
+<ul>
+    {% for comment in comments %}
+    <li>
+        <a href="{% url 'submission_comments' comment.submission.id %}">{{ comment.text }}</a> - by {{ comment.author.username }} ({{ comment.created_at|timesince }} ago)
+        <a href="{% url 'unhide_comment' comment.id %}">unhide</a>
+    </li>
+    {% endfor %}
+</ul>
+
+{% if not submissions and not comments %}
+    <p>No hidden submissions or comments found.</p>
+{% endif %}
 {% endblock %}

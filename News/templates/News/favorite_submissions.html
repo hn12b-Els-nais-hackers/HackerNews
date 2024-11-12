@@ -1,0 +1,45 @@
+{% extends 'News/base.html' %}
+
+{% block title %}Favorite Submissions{% endblock %}
+
+{% block content %}
+<h2>Favorite Submissions</h2>
+<table>
+    {% for submission in submissions %}
+    <tr class='athing' id='{{ submission.id }}'>
+        <td align="right" valign="top" class="title">
+            <span class="rank">{{ forloop.counter }}.</span>
+        </td>
+        <td class="title">
+            <span class="titleline">
+                <a href="{{ submission.url }}">{{ submission.title }}</a>
+                {% if submission.url %}
+                    <span class="sitebit comhead">({{ submission.url }})</span>
+                {% endif %}
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2"></td>
+        <td class="subtext">
+            <span class="score">{{ submission.points }} points</span> by {{ submission.user.username }}
+            <span class="age">{{ submission.created_at|timesince }} ago</span>
+            | <a href="{% url 'submission_comments' submission.id %}">{{ submission.submission_comments.count }} comments</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h2>Favorite Comments</h2>
+<ul>
+    {% for comment in comments %}
+    <li>
+        <a href="{% url 'submission_comments' comment.submission.id %}">{{ comment.text }}</a> - by {{ comment.user.username }} ({{ comment.created_at|timesince }} ago)
+    </li>
+    {% endfor %}
+</ul>
+
+{% if not submissions and not comments %}
+    <p>No favorite submissions or comments found.</p>
+{% endif %}
+{% endblock %} 

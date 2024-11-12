@@ -64,22 +64,39 @@ def all_comments(request):
     comments = Comment.objects.all()
     return render(request, 'News/comments.html', {'comments': comments})
 
+@login_required
 def submission_comments(request, submission_id):
     submission = get_object_or_404(Submission, id=submission_id)
-    comments = submission.submission_comments.all()
+    comments = submission.submission_comments.exclude(hidden_by=request.user) 
     
+    # Manejar el voto
     if request.method == 'POST':
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            comment = form.save(commit=False)
-            comment.submission = submission
-            comment.save()
-            return redirect('submission_comments', submission_id=submission.id)
-    else:
-        form = CommentForm()
-    
-    return render(request, 'news/submission_comments.html', {'submission': submission, 'comments': comments, 'form': form})
+        action = request.POST.get('action')
+        if action == 'vote':
+            if request.user in submission.voters.all():
+                submission.points -= 1
+                submission.voters.remove(request.user)
+            else:
+                submission.points += 1
+                submission.voters.add(request.user)
+            submission.save()
+        elif action == 'fav':
+            if request.user in submission.favorited_by.all():
+                submission.favorited_by.remove(request.user)
+            else:
+                submission.favorited_by.add(request.user)
+            submission.save()
+        elif action == 'hide':
+            submission.hidden_by.add(request.user)
+            submission.save()
+        elif action == 'unhide':
+            submission.hidden_by.remove(request.user)
+            submission.save()
 
+    return render(request, 'News/submission_comments.html', {
+        'submission': submission,
+        'comments': comments,
+    })
 
 @login_required
 def create_comment(request, submission_id):
@@ -144,7 +161,8 @@ def unvote_submission(request, submission_id):
         submission.points -= 1
         submission.voters.remove(request.user)
         submission.save()
-    return redirect('newest')
+    next_page = request.GET.get('next', 'newest')
+    return redirect(next_page)
 
 @login_required
 def hide_submission(request, submission_id):
@@ -156,7 +174,8 @@ def hide_submission(request, submission_id):
 @login_required
 def hidden_submissions(request):
     submissions = Submission.objects.filter(hidden_by=request.user).order_by('-created_at')
-    return render(request, 'News/hidden_submissions.html', {'submissions': submissions})
+    comments = Comment.objects.filter(hidden_by=request.user).order_by('-created_at') 
+    return render(request, 'News/hidden_submissions.html', {'submissions': submissions, 'comments': comments})
 
 @login_required
 def unhide_submission(request, submission_id):
@@ -164,8 +183,10 @@ def unhide_submission(request, submission_id):
     if request.user in submission.hidden_by.all():
         submission.hidden_by.remove(request.user)
         submission.save()
-    return redirect('hidden_submissions')
-    @login_required
+    next_page = request.GET.get('next', request.META.get('HTTP_REFERER', 'newest'))
+    return redirect(next_page)
+
+@login_required
 def edit_comment(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
     
@@ -191,5 +212,55 @@ def delete_comment(request, comment_id):
         comment.delete()
         return redirect('submission_comments', submission_id=submission_id)
     
+    return redirect('submission_comments', submission_id=comment.submission.id)
+
+@login_required
+def fav_submission(request, submission_id):
+    submission = get_object_or_404(Submission, id=submission_id)
+    if request.user in submission.favorited_by.all():
+        submission.favorited_by.remove(request.user)
+    else:
+        submission.favorited_by.add(request.user)
+    submission.save()
+    return redirect('submission_comments', submission_id=submission.id)
+
+def favorite_submissions(request):
+    submissions = Submission.objects.filter(favorited_by=request.user).order_by('-created_at')
+    comments = Comment.objects.filter(favorited_by=request.user).order_by('-created_at')
+    return render(request, 'News/favorite_submissions.html', {'submissions': submissions, 'comments': comments})
+
+@login_required
+def vote_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    if request.user in comment.voters.all():
+        comment.points -= 1
+        comment.voters.remove(request.user)
+    else:
+        comment.points += 1
+        comment.voters.add(request.user)
+    comment.save()
+    return redirect('submission_comments', submission_id=comment.submission.id)
+
+@login_required
+def fav_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    if request.user in comment.favorited_by.all():
+        comment.favorited_by.remove(request.user)
+    else:
+        comment.favorited_by.add(request.user)
+    comment.save()
+    return redirect('submission_comments', submission_id=comment.submission.id)
+
+@login_required
+def hide_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    comment.hidden_by.add(request.user)
+    return redirect('submission_comments', submission_id=comment.submission.id)
+
+@login_required
+def unhide_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    comment.hidden_by.remove(request.user)
+    comment.save()
     return redirect('submission_comments', submission_id=comment.submission.id)
 

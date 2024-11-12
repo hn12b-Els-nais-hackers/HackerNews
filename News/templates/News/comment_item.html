@@ -67,6 +67,29 @@
         <!-- Texto del comentario -->
         <span class="commtext">{{ comment.text }}</span>
 
+        <!-- Botones de votar, favoritar y ocultar -->
+        <table class="comment-actions">
+            <tr>
+                <td class="subtext">
+                {% if user in comment.voters.all %}
+                    <a href="{% url 'vote_comment' comment.id %}">unvote</a>
+                {% else %}
+                    <a href="{% url 'vote_comment' comment.id %}">vote</a>
+                {% endif %}
+                {% if user in comment.favorited_by.all %}
+                    <a href="{% url 'fav_comment' comment.id %}">unfav</a>
+                {% else %}
+                    <a href="{% url 'fav_comment' comment.id %}">fav</a>
+                {% endif %}
+                {% if user in comment.hidden_by.all %}
+                    <a href="{% url 'unhide_comment' comment.id %}">unhide</a>
+                {% else %}
+                    <a href="{% url 'hide_comment' comment.id %}">hide</a>
+                {% endif %}
+                </td>
+            <tr>
+        </table>
+
         <!-- Botones de editar y eliminar -->
         {% if user.is_authenticated and comment.author == user %}
             <div class="comment-actions">
