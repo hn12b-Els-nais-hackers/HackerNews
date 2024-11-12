@@ -15,6 +15,9 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('add_comment/', views.add_comment, name='add_comment'),
+    path('submission/<int:submission_id>/comment/', views.create_comment, name='create_comment'),
+    path('submission/<int:submission_id>/', views.submission_comments, name='submission_comments'),
+    # Página de perfil del usuario
     path('profile/<str:username>/', views.profile_view, name='profile'),
     path('upvote/<int:submission_id>/', views.upvote_submission, name='upvote_submission'),
     path('unvote/<int:submission_id>/', views.unvote_submission, name='unvote_submission'),

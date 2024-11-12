@@ -43,7 +43,7 @@
                             {% if user.is_authenticated and submission in user.voted_submissions.all %}
                                 | <a href="{% url 'unvote_submission' submission.id %}">unvote</a>
                             {% endif %}
-                            | <a href="{% url 'hide_submission' submission.id %}?next=news">hide</a> | <a href="#">{{ submission.comment_count }} comments</a>
+                            | <a href="{% url 'hide_submission' submission.id %}?next=news">hide</a> | <a href="{% url 'submission_comments' submission.id %}">{{ submission.comment_count }} comments</a>
                         </td>
                     </tr>
                     <tr class="spacer" style="height:5px"></tr>

@@ -27,6 +27,8 @@ class Submission(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     voters = models.ManyToManyField(User, related_name='voted_submissions', blank=True)
     hidden_by = models.ManyToManyField(User, related_name='hidden_submissions', blank=True)
+    comments = models.ManyToManyField('Comment', related_name='submissions', blank=True)
+    
 
     def __str__(self):
         return self.title
@@ -59,5 +61,9 @@ class UserProfile(models.Model):
     )
     
 class Comment(models.Model):
+    submission = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name='submission_comments', null=True, blank=True)
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='replies')
+    

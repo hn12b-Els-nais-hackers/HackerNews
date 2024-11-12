@@ -1,0 +1,85 @@
+<style>
+    .commtext {
+        color: #000000 !important;
+        font-family: Verdana, Geneva, sans-serif;
+        font-size: 9pt;
+        margin-left: 4px;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .comment-meta {
+        color: #828282;
+        font-size: 8pt;
+        margin-bottom: 4px;
+    }
+
+    .hnuser {
+        color: #3c963c;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .age {
+        color: #828282;
+    }
+
+    .reply-form {
+        margin: 1em 0;
+        padding-left: 20px;
+    }
+
+    .reply-link {
+        font-size: 8pt;
+        color: #828282;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+    .comment {
+        margin-bottom: 20px !important;
+        padding-bottom: 10px;
+    }
+
+    .comment-content {
+        margin-bottom: 10px;
+    }
+</style>
+
+<div class="comment" style="margin-left: {% if comment.parent %}40{% else %}0{% endif %}px">
+    <div class="comment-content">
+        <!-- Meta información (autor y tiempo) -->
+        <div class="comment-meta">
+            <span class="comhead">
+                <a href="{% url 'profile' comment.author.username %}" class="age">{{ comment.author.username }}</a>
+                <span class="age" title="{{ comment.created_at }}">{{ comment.created_at|timesince }} ago</span>
+                {% if comment.submission %}
+                    | <a href="{% url 'submission_comments' comment.submission.id %}" class="age">parent</a>
+                {% endif %}
+            </span>
+        </div>
+
+        <!-- Texto del comentario -->
+        <span class="commtext">{{ comment.text }}</span>
+
+        <!-- Enlace de reply -->
+        <div class="reply-link">
+            <a href="#" class="reply-toggle" data-comment-id="{{ comment.id }}">reply</a>
+        </div>
+        
+        <!-- Formulario de respuesta (inicialmente oculto) -->
+        <div class="reply-form" id="reply-form-{{ comment.id }}" style="display: none;">
+            <form method="post" action="{% url 'create_comment' comment.submission.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                <textarea name="text" rows="4" style="width: 100%;"></textarea>
+                <button type="submit">add reply</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Respuestas a este comentario -->
+    {% for reply in comment.replies.all %}
+        {% include 'news/comment_item.html' with comment=reply %}
+    {% endfor %}
+</div>

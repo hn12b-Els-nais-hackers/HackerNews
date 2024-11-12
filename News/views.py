@@ -44,7 +44,9 @@ def ask(request):
     return render(request, 'News/ask.html')
 
 def comments(request):
-    return render(request, 'News/comments.html')
+    # Obtener todos los comentarios ordenados por fecha de creación
+    comments = Comment.objects.select_related('author', 'submission').order_by('-created_at')
+    return render(request, 'News/comments.html', {'comments': comments})
 
 def login(request):
     return render(request, 'News/login.html')
@@ -57,6 +59,55 @@ def add_comment(request):
     if form.is_valid():
         form.save()
     return redirect('News/comments.html')
+
+def all_comments(request):
+    comments = Comment.objects.all()
+    return render(request, 'News/comments.html', {'comments': comments})
+
+def submission_comments(request, submission_id):
+    submission = get_object_or_404(Submission, id=submission_id)
+    comments = submission.submission_comments.all()
+    
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.submission = submission
+            comment.save()
+            return redirect('submission_comments', submission_id=submission.id)
+    else:
+        form = CommentForm()
+    
+    return render(request, 'news/submission_comments.html', {'submission': submission, 'comments': comments, 'form': form})
+
+
+@login_required
+def create_comment(request, submission_id):
+    if request.method == 'POST':
+        submission = get_object_or_404(Submission, id=submission_id)
+        text = request.POST.get('text')
+        parent_id = request.POST.get('parent_id')
+
+        if text:  # Solo crear si hay texto
+            if parent_id:
+                try:
+                    parent_comment = Comment.objects.get(id=parent_id)
+                    comment = Comment.objects.create(
+                        submission=submission,
+                        text=text,
+                        author=request.user,
+                        parent=parent_comment
+                    )
+                except Comment.DoesNotExist:
+                    pass
+            else:
+                comment = Comment.objects.create(
+                    submission=submission,
+                    text=text,
+                    author=request.user
+                )
+
+    return redirect('submission_comments', submission_id=submission_id)
 
 @login_required
 def profile_view(request, username):
