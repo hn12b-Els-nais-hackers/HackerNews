@@ -24,4 +24,6 @@ urlpatterns = [
     path('hide/<int:submission_id>/', views.hide_submission, name='hide_submission'),
     path('hidden/', views.hidden_submissions, name='hidden_submissions'),
     path('unhide/<int:submission_id>/', views.unhide_submission, name='unhide_submission'),
+    path('comment/<int:comment_id>/edit/', views.edit_comment, name='edit_comment'),
+    path('comment/<int:comment_id>/delete/', views.delete_comment, name='delete_comment'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  
