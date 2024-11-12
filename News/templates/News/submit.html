@@ -1,18 +1,54 @@
-<!-- News/templates/News/submit.html -->
 {% extends 'News/base.html' %}
 
-{% block title %}Submit a New URL{% endblock %}
+{% block title %}Submit a New Submission{% endblock %}
 
 {% block content %}
-    <h2>Submit a New URL</h2>
+    <h2>Submit a New Submission</h2>
+    
     <form method="POST" action="{% url 'submit' %}">
         {% csrf_token %}
+
+        <!-- Title Input -->
         <label for="title">Title:</label>
         <input type="text" id="title" name="title" required>
 
-        <label for="url">URL:</label>
-        <input type="url" id="url" name="url" required>
+        <!-- Submission Type Dropdown -->
+        <label for="submission_type">Submission Type:</label>
+        <select id="submission_type" name="submission_type" required>
+            <option value="url">URL</option>
+            <option value="ask">Ask</option>
+        </select>
 
+        <!-- URL Input (Initially visible) -->
+        <div id="url_input">
+            <label for="url">URL:</label>
+            <input type="url" id="url" name="url">
+        </div>
+
+        <!-- Ask Text Input (Initially hidden) -->
+        <div id="ask_input" style="display: none;">
+            <label for="text">Ask Question:</label>
+            <textarea id="text" name="text" rows="4"></textarea>
+        </div>
+
+        <!-- Submit Button -->
         <button type="submit">Submit</button>
     </form>
+
+    <!-- Script to Toggle URL and Ask Inputs Based on Submission Type -->
+    <script>
+        const submissionTypeSelect = document.getElementById('submission_type');
+        const urlInputDiv = document.getElementById('url_input');
+        const askInputDiv = document.getElementById('ask_input');
+
+        submissionTypeSelect.addEventListener('change', function() {
+            if (this.value === 'url') {
+                urlInputDiv.style.display = 'block';
+                askInputDiv.style.display = 'none';
+            } else if (this.value === 'ask') {
+                urlInputDiv.style.display = 'none';
+                askInputDiv.style.display = 'block';
+            }
+        });
+    </script>
 {% endblock %}

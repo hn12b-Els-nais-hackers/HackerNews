@@ -61,13 +61,13 @@ pre { overflow: auto; padding: 2px; white-space: pre-wrap; overflow-wrap:anywher
 pre:hover { overflow:auto }
 
 .votearrow {
-  width:      10px;
-  height:     10px;
-  border:     0px;
-  margin:     3px 2px 6px;
-  background-repeat: no-repeat;
-  background: url("triangle.svg"), linear-gradient(transparent, transparent) no-repeat;
-  background-size: 10px;
+  width: 10px;
+  height: 10px;
+  border: 0;
+  margin: 3px 2px 6px;
+  background: url("images/triangle.svg") no-repeat center;
+  background-size: contain;
+  display: inline-block;
 }
 
 .votelinks.nosee div.votearrow.rotate180 {

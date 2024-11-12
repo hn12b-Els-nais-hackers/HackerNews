@@ -1,0 +1,60 @@
+<!-- News/templates/news/submission_comments.html -->
+
+{% extends 'News/base.html' %}
+
+{% block content %}
+<table>
+    <tr class='athing' id='{{ submission.id }}'>
+        <td align="right" valign="top" class="title">
+            <span class="rank">{{ forloop.counter }}.</span>
+        </td>
+        <td class="title">
+            <span class="titleline">
+                <a href="{{ submission.url }}">{{ submission.title }}</a>
+                {% if submission.url %}
+                    <span class="sitebit comhead">({{ submission.url }})</span>
+                {% endif %}
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2"></td>
+        <td class="subtext">
+            <span class="score">{{ submission.points }} points</span> by {{ submission.user.username }}
+            <span class="age">{{ submission.created_at|timesince }} ago</span>
+            | 
+            {% if user in submission.favorited_by.all %}
+                <a href="{% url 'fav_submission' submission.id %}">unfav</a>
+            {% else %}
+                <a href="{% url 'fav_submission' submission.id %}">fav</a>
+            {% endif %}
+            | <a href="{% url 'submission_comments' submission.id %}">
+                {{ submission.submission_comments.count }} comments</a>
+            | {% if user in submission.voters.all %}
+                <a href="{% url 'unvote_submission' submission.id %}">unvote</a>
+            {% else %}
+                <a href="{% url 'upvote_submission' submission.id %}">vote</a>
+            {% endif %}
+            | {% if user in submission.hidden_by.all %}
+                <a href="{% url 'unhide_submission' submission.id %}">unhide</a>
+            {% else %}
+                <a href="{% url 'hide_submission' submission.id %}">hide</a>
+            {% endif %}
+        </td>
+    </tr>
+</table>
+
+<form method="post" action="{% url 'create_comment' submission.id %}">
+    {% csrf_token %}
+    <textarea name="text"></textarea>
+    <button type="submit">add comment</button>
+</form>
+
+<ul>
+    {% for comment in comments %}
+        {% if not comment.parent %}
+            {% include 'news/comment_item.html' with comment=comment %}
+        {% endif %}
+    {% endfor %}
+</ul>
+{% endblock %}
