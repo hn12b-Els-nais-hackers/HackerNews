@@ -25,9 +25,18 @@ class Submission(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     submission_type = models.CharField(max_length=10, choices=SUBMISSION_TYPES, default='url')
     created_at = models.DateTimeField(auto_now_add=True)
+    voters = models.ManyToManyField(User, related_name='voted_submissions', blank=True)
+    hidden_by = models.ManyToManyField(User, related_name='hidden_submissions', blank=True)
+    comments = models.ManyToManyField('Comment', related_name='submissions', blank=True)
+    favorited_by = models.ManyToManyField(User, related_name='favorited_submissions', blank=True)
+    
 
     def __str__(self):
         return self.title
+
+    def upvote(self):
+        self.points += 1
+        self.save()
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -54,4 +63,17 @@ class UserProfile(models.Model):
     
 class Comment(models.Model):
     text = models.TextField()
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+    submission = models.ForeignKey('Submission', related_name='submission_comments', on_delete=models.CASCADE)
+    favorited_by = models.ManyToManyField(User, related_name='favorited_comments', blank=True)
+    hidden_by = models.ManyToManyField(User, related_name='hidden_comments', blank=True)
+    voters = models.ManyToManyField(User, related_name='voted_comments', blank=True)
+    points = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.text
+
+    def upvote(self):
+        self.points += 1
+        self.save()
