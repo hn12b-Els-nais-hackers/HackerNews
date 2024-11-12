@@ -19,5 +19,7 @@ urlpatterns = [
     path('submission/<int:submission_id>/', views.submission_comments, name='submission_comments'),
     # Página de perfil del usuario
     path('profile/<str:username>/', views.profile_view, name='profile'),
+    path('comment/<int:comment_id>/edit/', views.edit_comment, name='edit_comment'),
+    path('comment/<int:comment_id>/delete/', views.delete_comment, name='delete_comment'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  
 

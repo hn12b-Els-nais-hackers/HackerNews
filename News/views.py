@@ -123,3 +123,31 @@ def profile_view(request, username):
 
     return render(request, 'News/profile.html', {'form': form, 'user_profile': user_profile, 'user': user})
 
+@login_required
+def edit_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    
+    # Verificar que el usuario actual es el autor del comentario
+    if comment.author != request.user:
+        return redirect('submission_comments', submission_id=comment.submission.id)
+    
+    if request.method == 'POST':
+        text = request.POST.get('text')
+        if text:
+            comment.text = text
+            comment.save()
+    
+    return redirect('submission_comments', submission_id=comment.submission.id)
+
+@login_required
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    
+    # Verificar que el usuario actual es el autor del comentario
+    if comment.author == request.user:
+        submission_id = comment.submission.id
+        comment.delete()
+        return redirect('submission_comments', submission_id=submission_id)
+    
+    return redirect('submission_comments', submission_id=comment.submission.id)
+

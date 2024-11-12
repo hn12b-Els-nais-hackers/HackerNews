@@ -114,6 +114,25 @@
                 replyForm.style.display = replyForm.style.display === 'none' ? 'block' : 'none';
             });
         });
+
+        // Manejar los clicks en los enlaces "edit"
+        document.querySelectorAll('.edit-toggle').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const commentId = this.dataset.commentId;
+                const editForm = document.getElementById('edit-form-' + commentId);
+                editForm.style.display = editForm.style.display === 'none' ? 'block' : 'none';
+            });
+        });
+
+        // Manejar los clicks en los botones "cancel"
+        document.querySelectorAll('.cancel-edit').forEach(function(button) {
+            button.addEventListener('click', function(e) {
+                const commentId = this.dataset.commentId;
+                const editForm = document.getElementById('edit-form-' + commentId);
+                editForm.style.display = 'none';
+            });
+        });
     });
     </script>
 </body>
