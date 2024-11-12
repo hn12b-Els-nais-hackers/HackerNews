@@ -87,6 +87,15 @@ def user_profile(request, user_id):
     
     return render(request, 'News/user_profile.html', context)
 
+# Pàgina de cerca: mostra les submissions que contenen el títol cercat
+def search(request):
+    query = request.GET.get('q', '')
+    if query:
+        submissions = Submission.objects.filter(title__icontains=query)
+    else:
+        submissions = Submission.objects.none()  # Si no hi ha consulta, retorna un queryset buit
+    return render(request, 'News/search_results.html', {'submissions': submissions, 'query': query})
+
 def ask(request):
     return render(request, 'News/ask.html')
 

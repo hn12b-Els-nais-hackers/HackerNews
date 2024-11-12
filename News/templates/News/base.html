@@ -91,9 +91,10 @@
                                 <a href="mailto:hn@ycombinator.com">Contact</a>
                             </span>
                             <br><br>
-                            <form method="get" action="//hn.algolia.com/">
+                            <form method="get" action="{% url 'search' %}">
                                 Search: 
                                 <input type="text" name="q" size="17" autocorrect="off" spellcheck="false" autocapitalize="off" autocomplete="off">
+                                <button type="submit">Search</button>
                             </form>
                         </center>
                     </td>
