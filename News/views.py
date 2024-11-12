@@ -43,9 +43,10 @@ def edit_submission(request, submission_id):
     # Obté la submission o torna un 404 si no existeix
     submission = get_object_or_404(Submission, id=submission_id)
 
+    # IMPLEMENTACIÓ AMB L'USUARI LOGUEJAT
     # Comprova que l'usuari sigui el creador de la submission
-    if submission.user != request.user:
-        return redirect('submission_detail', submission_id=submission.id)  # Redirigeix a la pàgina de detall si no és el propietari
+    # if submission.user != request.user:
+    #    return redirect('newest', submission_id=submission.id)  # Redirigeix a la pàgina de detall si no és el propietari
 
     if request.method == 'POST':
         form = SubmissionForm(request.POST, instance=submission)
@@ -54,7 +55,7 @@ def edit_submission(request, submission_id):
             submission = form.save(commit=False)
             submission.updated_at = timezone.now()  # Registra la data d'actualització, si necessites aquest camp
             submission.save()
-            return redirect('submission_detail', submission_id=submission.id)  # Redirigeix a la pàgina de detall després de l'edició
+            return redirect('newest')  # Redirigeix a la pàgina de detall després de l'edició
     else:
         form = SubmissionForm(instance=submission)  # Carrega el formulari amb les dades existents
 

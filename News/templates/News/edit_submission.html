@@ -1,10 +1,13 @@
 <!-- edit_submission.html -->
 
-<h2>Edit Submission</h2>
+{% extends "News/base.html" %}
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save changes</button>
-</form>
-<a href="{% url 'submission_detail' submission.id %}">Cancel</a>
+{% block content %}
+    <h2>Edit Submission</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save changes</button>
+    </form>
+{% endblock %}
+
