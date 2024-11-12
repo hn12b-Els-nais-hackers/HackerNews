@@ -10,4 +10,6 @@ urlpatterns = [
     path('comments/', views.comments, name='comments'), 
     path('login/', views.login, name='login'),   
     path('threads/', views.threads, name='threads'), 
+    path('submission/<int:submission_id>/', views.submission_detail, name='submission_detail'),
+    path('submission/<int:submission_id>/edit/', views.edit_submission, name='edit_submission'),
 ]

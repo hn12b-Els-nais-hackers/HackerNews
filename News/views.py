@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from .models import Submission
 from .forms import SubmissionForm
 from django.utils import timezone
@@ -30,6 +30,28 @@ def submit(request):
     else:
         form = SubmissionForm()
     return render(request, 'News/submit.html', {'form': form})
+
+# Pàgina d'edició: permet a l'usuari editar una submission existent
+def edit_submission(request, submission_id):
+    # Obté la submission o torna un 404 si no existeix
+    submission = get_object_or_404(Submission, id=submission_id)
+
+    # Comprova que l'usuari sigui el creador de la submission
+    if submission.user != request.user:
+        return redirect('submission_detail', submission_id=submission.id)  # Redirigeix a la pàgina de detall si no és el propietari
+
+    if request.method == 'POST':
+        form = SubmissionForm(request.POST, instance=submission)
+        if form.is_valid():
+            # No cal assignar camps addicionals, només guardem els canvis
+            submission = form.save(commit=False)
+            submission.updated_at = timezone.now()  # Registra la data d'actualització, si necessites aquest camp
+            submission.save()
+            return redirect('submission_detail', submission_id=submission.id)  # Redirigeix a la pàgina de detall després de l'edició
+    else:
+        form = SubmissionForm(instance=submission)  # Carrega el formulari amb les dades existents
+
+    return render(request, 'News/edit_submission.html', {'form': form, 'submission': submission})
 
 def ask(request):
     return render(request, 'News/ask.html')

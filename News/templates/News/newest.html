@@ -27,6 +27,11 @@
                                 <span class="score">{{ submission.points }} points</span>
                                 <span class="age">{{ submission.created_at|timesince }} ago</span>
                                 | {{ submission.comment_count }} comments
+                                | <a href="{% url 'edit_submission' submission.id %}">edit</a>
+                                <!-- IMPLEMENTACIÓ AMB L'USUARI LOGUEJAT -->
+                                <!--{% if submission.user == request.user %}-->
+                                <!--| <a href="{% url 'edit_submission' submission.id %}">edit</a>-->
+                                <!--{% endif %}-->
                             </td>
                         </tr>
                         <tr class="spacer" style="height:5px"></tr>
