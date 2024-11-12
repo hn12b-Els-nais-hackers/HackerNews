@@ -1,22 +1,51 @@
+<style>
+    .commtext {
+        color: #000000 !important;
+        font-family: Verdana, Geneva, sans-serif;
+        font-size: 9pt;
+        margin-left: 4px;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .comment-meta {
+        color: #828282;
+        font-size: 8pt;
+        margin-bottom: 4px;
+    }
+
+    .hnuser {
+        color: #3c963c;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .age {
+        color: #828282;
+    }
+
+    .comment {
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+</style>
+
 {% extends 'News/base.html' %}
 
 {% block title %}Comments{% endblock %}
 
 {% block content %}
-    <h2>Comments</h2>
-    <!-- Mostrar todos los comentarios -->
-    <table class="comment-table" border="0">
+    <div class="comment-table" border="0">
         {% for comment in comments %}
             <tr class="athing comtr">
                 <td>
                     <div class="comment">
-                        <span class="commtext">
-                            {{ comment.text }}
-                        </span>
+                        
                         <div class="comment-meta">
                             <span class="comhead">
                                 {% if comment.author %}
-                                    <a href="{% url 'profile' comment.author.username %}" class="hnuser">
+                                    <a href="{% url 'profile' comment.author.username %}" class="age">
                                         {{ comment.author.username }}
                                     </a>
                                 {% else %}
@@ -25,6 +54,8 @@
                                 <span class="age" title="{{ comment.created_at }}">
                                     {{ comment.created_at|timesince }} ago
                                 </span>
+                                {# | <a href="{% url 'submission_comments' comment.submission.id %}">parent</a> #}                             
+                                 | <a href="#">context</a> |
                                 {% if comment.submission %}
                                     on: 
                                     <a href="{% url 'submission_comments' comment.submission.id %}">
@@ -33,14 +64,15 @@
                                 {% endif %}
                             </span>
                         </div>
+                        <span class="commtext">
+                            {{ comment.text }}
+                        </span>    
                     </div>
                     <br><br>
                 </td>
             </tr>
         {% empty %}
-            <tr>
-                <td>No comments yet.</td>
-            </tr>
+            <div>No comments yet.</div>
         {% endfor %}
-    </table>
+    </div>
 {% endblock %}

@@ -101,5 +101,20 @@
             </tbody>
         </table>
     </center>
+
+    <!-- Scripts al final del body -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Manejar los clicks en los enlaces "reply"
+        document.querySelectorAll('.reply-toggle').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const commentId = this.dataset.commentId;
+                const replyForm = document.getElementById('reply-form-' + commentId);
+                replyForm.style.display = replyForm.style.display === 'none' ? 'block' : 'none';
+            });
+        });
+    });
+    </script>
 </body>
 </html>

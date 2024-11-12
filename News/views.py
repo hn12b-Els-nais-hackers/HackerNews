@@ -84,23 +84,25 @@ def create_comment(request, submission_id):
         text = request.POST.get('text')
         parent_id = request.POST.get('parent_id')
 
-        if not text:  # Validación básica
-            return redirect('submission_comments', submission_id=submission_id)
-        
-        if parent_id:
-            parent_comment = Comment.objects.get(id=parent_id)
-            Comment.objects.create(
-                submission=submission,
-                text=text,
-                author=request.user,
-                parent=parent_comment
-            )
-        else:
-            Comment.objects.create(
-                submission=submission,
-                text=text,
-                author=request.user
-            )
+        if text:  # Solo crear si hay texto
+            if parent_id:
+                try:
+                    parent_comment = Comment.objects.get(id=parent_id)
+                    comment = Comment.objects.create(
+                        submission=submission,
+                        text=text,
+                        author=request.user,
+                        parent=parent_comment
+                    )
+                except Comment.DoesNotExist:
+                    pass
+            else:
+                comment = Comment.objects.create(
+                    submission=submission,
+                    text=text,
+                    author=request.user
+                )
+
     return redirect('submission_comments', submission_id=submission_id)
 
 @login_required
