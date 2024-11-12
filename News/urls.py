@@ -18,6 +18,7 @@ urlpatterns = [
     path('submission/<int:submission_id>/comment/', views.create_comment, name='create_comment'),
     path('submission/<int:submission_id>/', views.submission_comments, name='submission_comments'),
     path('submission/<int:submission_id>/edit/', views.edit_submission, name='edit_submission'),
+    path('submission/<int:submission_id>/delete/', views.delete_submission, name='delete_submission'),
 
     # Página de perfil del usuario
     path('profile/<str:username>/', views.profile_view, name='profile'),

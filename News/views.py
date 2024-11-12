@@ -61,6 +61,15 @@ def edit_submission(request, submission_id):
 
     return render(request, 'News/edit_submission.html', {'form': form, 'submission': submission})
 
+# Pagina de confirmació per eliminar una submission
+def delete_submission(request, submission_id):
+    submission = get_object_or_404(Submission, id=submission_id)
+    if request.method == 'POST':
+        submission.delete()
+        return redirect('newest')  # Redirigeix a la vista "newest" després d'eliminar
+
+    return render(request, 'News/delete_submission.html', {'submission': submission})
+
 def ask(request):
     return render(request, 'News/ask.html')
 
