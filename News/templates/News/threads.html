@@ -3,6 +3,105 @@
 {% block title %}threads{% endblock %}
 
 {% block content %}
-    <h2>threads</h2>
-    <p>This is a simple implementation of a threads aggregation site similar to Hacker News.</p>
+    <style>
+        .commtext {
+            color: #000000 !important;
+            font-family: Verdana, Geneva, sans-serif;
+            font-size: 9pt;
+            margin-left: 4px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .comment-meta {
+            color: #828282;
+            font-size: 8pt;
+            margin-bottom: 4px;
+        }
+
+        .hnuser {
+            color: #3c963c;
+            text-decoration: none;
+        }
+
+        .age, .comment-actions a {
+            color: #828282;
+            text-decoration: underline;
+        }
+
+        .reply-form {
+            margin: 1em 0;
+            padding-left: 20px;
+        }
+
+        .edit-form {
+            margin-top: 10px;
+        }
+
+        .edit-form textarea {
+            margin-bottom: 5px;
+        }
+    </style>
+
+    <div class="comment-table">
+        {% for comment in comments %}
+            <div class="comment" id="{{ comment.id }}">
+                <div class="comment-meta">
+                    <span class="comhead">
+                        {% if comment.points > 0 %}
+                            {{ comment.points }} point{{ comment.points|pluralize }} by 
+                        {% endif %}
+                        <a href="{% url 'profile' comment.author.username %}" class="hnuser">{{ comment.author.username }}</a>
+                        <span class="age">{{ comment.created_at|timesince }} ago</span>
+                        | <a href="{% url 'submission_comments' comment.submission.id %}#{{ comment.id }}">parent</a>
+                        | <a href="#">context</a>
+                        {% if not forloop.last %}
+                            | <a href="#{{ comment.next_comment.id }}">next</a>
+                        {% endif %}
+                        {% if not forloop.first %}
+                            | <a href="#{{ comment.previous_comment.id }}">prev</a>
+                        {% endif %}
+                        {% if user == comment.author %}
+                            | <a href="#" class="edit-toggle" data-comment-id="{{ comment.id }}">edit</a>
+                            | <a href="{% url 'delete_comment' comment.id %}" onclick="return confirm('Are you sure?')">delete</a>
+                        {% endif %}
+                        | on: <a href="{% url 'submission_comments' comment.submission.id %}">{{ comment.submission.title }}</a>
+                    </span>
+                </div>
+                <span class="commtext">{{ comment.text }}</span>
+                
+                <!-- Formulario de edición (inicialmente oculto) -->
+                {% if user == comment.author %}
+                    <div class="edit-form" id="edit-form-{{ comment.id }}" style="display: none;">
+                        <form method="post" action="{% url 'edit_comment' comment.id %}">
+                            {% csrf_token %}
+                            <textarea name="text" rows="4" style="width: 100%;">{{ comment.text }}</textarea>
+                            <button type="submit">update</button>
+                            <button type="button" class="cancel-edit" data-comment-id="{{ comment.id }}">cancel</button>
+                        </form>
+                    </div>
+                {% endif %}
+                
+                <!-- Botón y formulario de reply -->
+                <div class="reply-link">
+                    <a href="#" class="reply-toggle" data-comment-id="{{ comment.id }}">reply</a>
+                </div>
+                
+                <div class="reply-form" id="reply-form-{{ comment.id }}" style="display: none;">
+                    <form method="post" action="{% url 'create_comment' comment.submission.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                        <textarea name="text" rows="4" style="width: 100%;"></textarea>
+                        <button type="submit">add reply</button>
+                    </form>
+                </div>
+            </div>
+        {% empty %}
+            <div>No comments yet.</div>
+        {% endfor %}
+    </div>
+
+    {% for reply in comment.replies.all %}
+        {% include 'news/comment_item.html' with comment=reply %}
+    {% endfor %}
 {% endblock %}

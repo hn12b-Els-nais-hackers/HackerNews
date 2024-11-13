@@ -17,7 +17,6 @@
     .hnuser {
         color: #3c963c;
         text-decoration: none;
-        font-weight: bold;
     }
 
     .age {
@@ -25,9 +24,8 @@
     }
 
     .comment {
-        margin-bottom: 20px;
+        margin-bottom: 5px;
         padding-bottom: 10px;
-        border-bottom: 1px solid #eee;
     }
 </style>
 
@@ -36,41 +34,23 @@
 {% block title %}Comments{% endblock %}
 
 {% block content %}
-    <div class="comment-table" border="0">
+    <div class="comment-table">
         {% for comment in comments %}
-            <tr class="athing comtr">
-                <td>
-                    <div class="comment">
-                        
-                        <div class="comment-meta">
-                            <span class="comhead">
-                                {% if comment.author %}
-                                    <a href="{% url 'profile' comment.author.username %}" class="age">
-                                        {{ comment.author.username }}
-                                    </a>
-                                {% else %}
-                                    <span class="hnuser">anonymous</span>
-                                {% endif %}
-                                <span class="age" title="{{ comment.created_at }}">
-                                    {{ comment.created_at|timesince }} ago
-                                </span>
-                                {# | <a href="{% url 'submission_comments' comment.submission.id %}">parent</a> #}                             
-                                 | <a href="#">context</a> |
-                                {% if comment.submission %}
-                                    on: 
-                                    <a href="{% url 'submission_comments' comment.submission.id %}">
-                                        {{ comment.submission.title }}
-                                    </a>
-                                {% endif %}
-                            </span>
-                        </div>
-                        <span class="commtext">
-                            {{ comment.text }}
-                        </span>    
-                    </div>
-                    <br><br>
-                </td>
-            </tr>
+            <div class="comment">
+                <div class="comment-meta">
+                    <span class="comhead">
+                        {% if comment.points > 0 %}
+                            {{ comment.points }} point{{ comment.points|pluralize }} by 
+                        {% endif %}
+                        <a href="{% url 'profile' comment.author.username %}" class="hnuser">{{ comment.author.username }}</a>
+                        <span class="age">{{ comment.created_at|timesince }} ago</span>
+                        | <a href="{% url 'submission_comments' comment.submission.id %}#{{ comment.id }}">parent</a>
+                        | <a href="{% url 'submission_comments' comment.submission.id %}?context={{ comment.id }}#{{ comment.id }}">context</a>
+                        | on: <a href="{% url 'submission_comments' comment.submission.id %}">{{ comment.submission.title }}</a>
+                    </span>
+                </div>
+                <span class="commtext">{{ comment.text }}</span>
+            </div>
         {% empty %}
             <div>No comments yet.</div>
         {% endfor %}
