@@ -108,10 +108,10 @@
         </div>
 
         <div class="profile-links">
-            <a href="#">Submissions</a>
-            <a href="#">Comments</a>
+            <a href="{% url 'user_submissions' user.username %}">Submissions</a>
+            <a href="{% url 'user_comments' user.username %}">Comments</a>
             <a href="{% url 'hidden_submissions' %}">Hidden</a>
-            <a href="#">Upvoted Submissions / Comments</a>
+            <a href="{% url 'user_upvoted' user.username %}">Upvoted Submissions / Comments</a>
             <a href="{% url 'favorite_submissions' %}">Favorite Submissions / Comments (Publicly Visible)</a>
         </div>
 

@@ -127,22 +127,6 @@ def delete_submission(request, submission_id):
 
     return render(request, 'News/delete_submission.html', {'submission': submission})
 
-# Pàgina de perfil de l'usuari: mostra les submissions i comentaris de l'usuari
-def user_profile(request, user_id):
-    user = get_object_or_404(User, id=user_id)
-    profile = UserProfile.objects.get(user=user)
-    posts = Submission.objects.filter(user=user).order_by('-created_at')
-    comments = Comment.objects.filter(author=user).order_by('-created_at')
-    
-    context = {
-        'profile_user': user,
-        'profile': profile,
-        'posts': posts,
-        'comments': comments,
-    }
-    
-    return render(request, 'News/user_profile.html', context)
-
 # Pàgina de cerca: mostra les submissions que contenen el títol cercat
 def search(request):
     query = request.GET.get('q', '')
@@ -282,6 +266,33 @@ def profile_view(request, username):
         form = ProfileImageForm(instance=user_profile)
 
     return render(request, 'News/profile.html', {'form': form, 'user_profile': user_profile, 'user': user})
+
+# Pàgina de submissions de l'usuari: mostra les submissions de l'usuari
+def user_submissions(request, username):
+    user = get_object_or_404(User, username=username)
+    submissions = Submission.objects.filter(user=user).order_by('-created_at')  # Ordenades per data de creació, més recents primer
+    return render(request, 'News/user_submissions.html', {'user': user, 'submissions': submissions})
+
+
+# Pàgina de comentaris de l'usuari: mostra els comentaris de l'usuari
+def user_comments(request, username):
+    user = get_object_or_404(User, username=username)
+    comments = Comment.objects.filter(author=user).order_by('-created_at')
+    return render(request, 'News/user_comments.html', {'user': user, 'comments': comments})
+
+# Pàgina de submissions votades de l'usuari: mostra les submissions votades de l'usuari
+def user_upvoted(request, username):
+    viewed_user = get_object_or_404(User, username=username)
+    
+    # Get all upvoted submissions and comments using the voters field
+    upvoted_submissions = Submission.objects.filter(voters=viewed_user).order_by('-created_at')
+    upvoted_comments = Comment.objects.filter(voters=viewed_user).order_by('-created_at')
+    
+    return render(request, 'News/user_upvoted.html', {
+        'viewed_user': viewed_user,
+        'upvoted_submissions': upvoted_submissions,
+        'upvoted_comments': upvoted_comments,
+    })
 
 @login_required
 def upvote_submission(request, submission_id):

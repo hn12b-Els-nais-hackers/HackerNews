@@ -1,0 +1,62 @@
+<!-- News/templates/News/upvoted_content.html -->
+{% extends 'News/base.html' %}
+
+{% block title %}Upvoted Submissions and Comments | Hacker News{% endblock %}
+
+{% block content %}
+    <center>
+        <table border="0" cellpadding="0" cellspacing="0" width="85%" bgcolor="#f6f6ef">
+            <tr>
+                <td>
+                    <h2>Upvoted Submissions</h2>
+                    <table border="0" cellpadding="0" cellspacing="0">
+                        {% for submission in upvoted_submissions %}
+                        <tr class="athing" id="submission_{{ submission.id }}">
+                            <td valign="top" class="title">
+                                <span class="score" id="score_{{ submission.id }}">{{ submission.points }} points</span>
+                                <span class="age">{{ submission.created_at|timesince }} ago</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="title">
+                                <a href="{{ submission.url }}" rel="nofollow">{{ submission.title }}</a>
+                                <span class="sitebit comhead">({{ submission.domain }})</span>
+                            </td>
+                        </tr>
+                        <tr class="spacer" style="height:5px"></tr>
+                        {% empty %}
+                        <tr>
+                            <td>No upvoted submissions found.</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+
+                    <h2>Upvoted Comments</h2>
+                    <table border="0" cellpadding="0" cellspacing="0">
+                        {% for comment in upvoted_comments %}
+                        <tr class="athing" id="comment_{{ comment.id }}">
+                            <td valign="top" class="title">
+                                <span class="score" id="score_{{ comment.id }}">{{ comment.points }} points</span>
+                                <span class="age">{{ comment.created_at|timesince }} ago</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="comment-text">{{ comment.text }}</td>
+                        </tr>
+                        <tr>
+                            <td class="subtext">
+                                <a href="{% url 'submission_detail' comment.submission.id %}">on {{ comment.submission.title }}</a>
+                            </td>
+                        </tr>
+                        <tr class="spacer" style="height:5px"></tr>
+                        {% empty %}
+                        <tr>
+                            <td>No upvoted comments found.</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </center>
+{% endblock %}

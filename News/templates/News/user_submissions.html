@@ -1,0 +1,63 @@
+<!-- News/templates/News/user_submissions.html -->
+{% extends 'News/base.html' %}
+
+{% block title %}{{ user.username }}'s Submissions | Hacker News{% endblock %}
+
+{% block content %}
+    <center>
+        <table border="0" cellpadding="0" cellspacing="0" width="85%" bgcolor="#f6f6ef">
+            <tr>
+                <td>
+                    <h2>{{ user.username }}'s Submissions</h2>
+                    <table border="0" cellpadding="0" cellspacing="0">
+                        {% for submission in submissions %}
+                        <tr class='athing' id='{{ submission.id }}'>
+                            <td align="right" valign="top" class="title">
+                                <span class="rank">{{ forloop.counter }}.</span>
+                            </td>
+                            <td valign="top" class="votelinks">
+                                <center>
+                                    {% if user.is_authenticated and submission not in user.voted_submissions.all %}
+                                        <a id="up_{{ submission.id }}" href="{% url 'upvote_submission' submission.id %}?next=user_submissions">
+                                            <div class="votearrow" title="upvote"></div>
+                                        </a>
+                                    {% endif %}
+                                </center>
+                            </td>
+                            <td class="title">
+                                <span class="titleline">
+                                    <a href="{{ submission.url }}" rel="nofollow">{{ submission.title }}</a>
+                                    {% if submission.domain %}
+                                    <span class="sitebit comhead">({{ submission.domain }})</span>
+                                    {% endif %}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"></td>
+                            <td class="subtext">
+                                <span class="score" id="score_{{ submission.id }}">{{ submission.points }} points</span>
+                                <span class="age">{{ submission.created_at|timesince }} ago</span>
+                                {% if user.is_authenticated and submission in user.voted_submissions.all %}
+                                    | <a href="{% url 'unvote_submission' submission.id %}">unvote</a>
+                                {% endif %}
+                                | {{ submission.comment_count }} comments
+                                | <a href="{% url 'hide_submission' submission.id %}?next=user_submissions">hide</a>
+                                {% if submission.user == request.user %}
+                                    | <a href="{% url 'edit_submission' submission.id %}">edit</a>
+                                    | <a href="{% url 'delete_submission' submission.id %}">delete</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr class="spacer" style="height:5px"></tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3">No submissions available.</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </center>
+{% endblock %}

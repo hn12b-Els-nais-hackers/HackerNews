@@ -1,0 +1,39 @@
+<!-- News/templates/News/user_comments.html -->
+{% extends 'News/base.html' %}
+
+{% block title %}{{ user.username }}'s Comments | Hacker News{% endblock %}
+
+{% block content %}
+    <center>
+        <table border="0" cellpadding="0" cellspacing="0" width="85%" bgcolor="#f6f6ef">
+            <tr>
+                <td>
+                    <h2>{{ user.username }}'s Comments</h2>
+                    <table border="0" cellpadding="0" cellspacing="0">
+                        {% for comment in comments %}
+                        <tr class="athing" id="comment_{{ comment.id }}">
+                            <td valign="top" class="title">
+                                <span class="score" id="score_{{ comment.id }}">{{ comment.points }} points</span>
+                                <span class="age">{{ comment.created_at|timesince }} ago</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="comment-text">{{ comment.text }}</td>
+                        </tr>
+                        <tr>
+                            <td class="subtext">
+                                <a href="{% url 'submission_comments' comment.submission.id %}">on {{ comment.submission.title }}</a>
+                            </td>
+                        </tr>
+                        <tr class="spacer" style="height:5px"></tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3">No comments available.</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </center>
+{% endblock %}
