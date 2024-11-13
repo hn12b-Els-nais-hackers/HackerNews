@@ -97,7 +97,7 @@
                 <span id="created">{{ user.date_joined|date:"F d, Y" }}</span><br><br>
 
                 <label for="karma">Karma:</label>
-                <span id="karma">100</span><br><br> <!-- Karma is static in this example -->
+                <span id="karma">{{ karma }}</span><br><br> <!-- Karma is static in this example -->
 
                 <label for="about">About:</label><br>
                 <textarea name="about" id="about">{{ user_profile.about }}</textarea><br><br>
