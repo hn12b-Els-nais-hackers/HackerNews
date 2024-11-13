@@ -7,28 +7,65 @@
     
     <form method="POST" action="{% url 'submit' %}">
         {% csrf_token %}
+        
+        <!-- Display any form-wide non-field errors (e.g., duplicate URL error) -->
+        {% if form.non_field_errors %}
+            <div class="error">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
 
         <!-- Title Input -->
         <label for="title">Title:</label>
-        <input type="text" id="title" name="title" required>
+        <input type="text" id="title" name="title" value="{{ form.title.value }}" required>
+        {% if form.title.errors %}
+            <div class="error">
+                {% for error in form.title.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
 
         <!-- Submission Type Dropdown -->
         <label for="submission_type">Submission Type:</label>
         <select id="submission_type" name="submission_type" required>
-            <option value="url">URL</option>
-            <option value="ask">Ask</option>
+            <option value="url" {% if form.submission_type.value == 'url' %}selected{% endif %}>URL</option>
+            <option value="ask" {% if form.submission_type.value == 'ask' %}selected{% endif %}>Ask</option>
         </select>
+        {% if form.submission_type.errors %}
+            <div class="error">
+                {% for error in form.submission_type.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
 
         <!-- URL Input (Initially visible) -->
-        <div id="url_input">
+        <div id="url_input" {% if form.submission_type.value == 'ask' %}style="display: none;"{% endif %}>
             <label for="url">URL:</label>
-            <input type="url" id="url" name="url">
+            <input type="url" id="url" name="url" value="{{ form.url.value }}">
+            {% if form.url.errors %}
+                <div class="error">
+                    {% for error in form.url.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
 
         <!-- Ask Text Input (Initially hidden) -->
-        <div id="ask_input" style="display: none;">
+        <div id="ask_input" {% if form.submission_type.value == 'url' %}style="display: none;"{% endif %}>
             <label for="text">Ask Question:</label>
-            <textarea id="text" name="text" rows="4"></textarea>
+            <textarea id="text" name="text" rows="4">{{ form.text.value }}</textarea>
+            {% if form.text.errors %}
+                <div class="error">
+                    {% for error in form.text.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
 
         <!-- Submit Button -->

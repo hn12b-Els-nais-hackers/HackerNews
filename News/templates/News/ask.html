@@ -33,6 +33,7 @@
                             <td colspan="2"></td>
                             <td class="subtext">
                                 <span class="score" id="score_{{ submission.id }}">{{ submission.points }} points</span>
+                                by <a href="{% url 'profile' submission.user.username %}" class="hnuser">{{ submission.user.username }}</a>
                                 <span class="age">{{ submission.created_at|timesince }} ago</span>
                                 {% if user.is_authenticated and submission in user.voted_submissions.all %}
                                     | <a href="{% url 'unvote_submission' submission.id %}?next={{ request.path }}">unvote</a>
@@ -40,8 +41,8 @@
                                 | <a href="{% url 'submission_comments' submission.id %}">{{ submission.submission_comments.count }} comments</a>
                                 | <a href="{% url 'hide_submission' submission.id %}?next=ask">hide</a>
                                 {% if user == submission.user %}
-                                    | <a href="{% url 'edit_submission' submission.id %}">edit</a>
-                                    | <a href="{% url 'delete_submission' submission.id %}">delete</a>
+                                    | <a href="{% url 'edit_submission' submission.id %}?next={{ request.path }}">edit</a>
+                                    | <a href="{% url 'delete_submission' submission.id %}?next={{ request.path }}">delete</a>
                                 {% endif %}
                             </td>
                         </tr>

@@ -19,6 +19,7 @@ urlpatterns = [
     path('submission/<int:submission_id>/', views.submission_comments, name='submission_comments'),
     path('submission/<int:submission_id>/edit/', views.edit_submission, name='edit_submission'),
     path('submission/<int:submission_id>/delete/', views.delete_submission, name='delete_submission'),
+    path('user/<int:user_id>/', views.user_profile, name='user_profile'),
     path('search/', views.search, name='search'),
 
     # Página de perfil del usuario

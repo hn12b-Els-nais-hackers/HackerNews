@@ -62,6 +62,21 @@ def test_s3_upload(request):
     # Redirect back to the profile page after the upload
     return redirect('profile', username=request.user.username)
 
+def user_profile(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    profile = UserProfile.objects.get(user=user)
+    posts = Submission.objects.filter(user=user).order_by('-created_at')
+    comments = Comment.objects.filter(author=user).order_by('-created_at')
+    
+    context = {
+        'profile_user': user,
+        'profile': profile,
+        'posts': posts,
+        'comments': comments,
+    }
+    
+    return render(request, 'News/user_profile.html', context)
+
 # Pàgina principal: mostra les submissions ordenades per punts
 def news(request):
     submissions = Submission.objects.all().order_by('-points')  # Ordena per punts
@@ -106,6 +121,10 @@ def edit_submission(request, submission_id):
     # Comprova que l'usuari sigui el creador de la submission
     # if submission.user != request.user:
     #    return redirect('newest', submission_id=submission.id)  # Redirigeix a la pàgina de detall si no és el propietari
+    if request.user != submission.user:
+        messages.error(request, "You can't edit this submission because you're not the author.")
+        next_page = request.GET.get('next', 'newest')
+        return redirect(next_page)
 
     if request.method == 'POST':
         form = SubmissionForm(request.POST, instance=submission)
@@ -128,12 +147,14 @@ def delete_submission(request, submission_id):
     # Verificar si el usuario actual es el autor de la submission
     if request.user != submission.user:
         messages.error(request, "You can't delete this submission because you're not the author.")
-        return redirect('newest')
+        next_page = request.GET.get('next', 'newest')
+        return redirect(next_page)
         
     if request.method == 'POST':
         submission.delete()
         messages.success(request, 'Submission deleted successfully.')
-        return redirect('newest')
+        next_page = request.GET.get('next', 'newest')
+        return redirect(next_page)
 
     return render(request, 'News/delete_submission.html', {'submission': submission})
 
