@@ -13,6 +13,26 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 from pathlib import Path
 
+# Configura el backend de almacenamiento predeterminado para S3
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+# Configuración de S3
+AWS_ACCESS_KEY_ID = "ASIAQ2NVUYZ5722OYSQR"
+AWS_SECRET_ACCESS_KEY = "TKygBhze/eGvTMOYmSfSrZqBgOmTDbAmqJUcN7Gu"
+AWS_SESSION_TOKEN = "IQoJb3JpZ2luX2VjEFEaCXVzLXdlc3QtMiJHMEUCIQCMYDrfAnzarTRi2jUxrkkT/mnJmLweKR7paM0fQKJrvgIgSFtTGFemBmIPZL0lK3adT9jQOKtC0hGbe4lqVnP3s6UqxAII2v//////////ARAAGgwwNTY3NTIzOTE4MDMiDL5C3QKCjFgzQCbbLCqYAkchPk5Q8o2LrllISjBUR4E3ZNTEZ59WwFNlKMgh0Wn6gCrSEZXKxeOAMFK+GLxb7AbWaQNn93GYyHT4NRMDG43R8NdY5c83QwHzQpv8UaXkzDuWcg0kFr29B0IKe/WzjOni8f3Iu1hXI06nki+/2YjfEpt2jzEHO4lz5gp9AAvlK8A1tLk+gvPqR4M/DkUQZBBOhqFtT8Tfc3GGGhnhqIsu6FKMwJUuSwTJ8NUZBGPfWgw/oucf6NNZijvqmJFkgZtcVJ2HY1hQUYY8C5SJWgGiNngnwN3fo38cnM09VrghiMiOSgjv+ah905xgp5YXl04S/Vm0FBOZzWnFH3Kjavdv3qLRA0O9NV6yn8lY9/l99HaetCysiSUwmbvTuQY6nQFQZDanGMuqyXo1ONc/DsLeR/uy670FcwqU5duFOYF/BZXZs7n00lthvIKi3nTUpco4VKbVSCA07fU0I8Znw38sx0pRLRdcfjyBXWWwIvy4cIuiLffTm/cwsPoz3aiUXHN/doSavckLiIY9pPw7hs3CkVKYw0ReRgZNP5PD8uks75Ok/LaV1lJHubaeIzdCrQu9sFQRxoYwlIEuy4ut"
+AWS_STORAGE_BUCKET_NAME = 'labasw'
+AWS_S3_REGION_NAME = 'us-east-1'  # Cambia a tu región de S3
+AWS_QUERYSTRING_AUTH = False  # Para deshabilitar las firmas de URL en archivos públicos
+
+# Opcional: para que los archivos cargados sean públicos por defecto
+AWS_DEFAULT_ACL = 'public-read'
+
+# Opcional: configurar la URL base de los archivos cargados
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -33,6 +53,7 @@ SITE_ID = 1
 # Application definition
 
 INSTALLED_APPS = [
+    'storages',
     'News',
     'django.contrib.sites',
     'social_django',
@@ -93,9 +114,6 @@ SOCIAL_AUTH_SESSION_EXPIRATION = False
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
 
 ROOT_URLCONF = 'HackerNews.urls'
-
-MEDIA_URL = 'media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'News', 'media')
 
 TEMPLATES = [
     {

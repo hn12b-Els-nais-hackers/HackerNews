@@ -37,4 +37,6 @@ urlpatterns = [
     path('fav/comment/<int:comment_id>/', views.fav_comment, name='fav_comment'),
     path('hide/comment/<int:comment_id>/', views.hide_comment, name='hide_comment'),
     path('unhide/comment/<int:comment_id>/', views.unhide_comment, name='unhide_comment'),
+    path('test-upload/', views.test_s3_upload, name='test_s3_upload'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  
+

@@ -47,3 +47,8 @@ class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ['text']
+
+class ProfileImageForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['avatar', 'banner', 'about']

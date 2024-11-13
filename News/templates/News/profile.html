@@ -14,7 +14,7 @@
         }
         .profile-header {
             background-color: #7467c3;
-            background-image: url('{{ user.banner.url }}'); /* Ensure banner.url is defined */
+            background-image: url('{{ user_profile.banner.url }}'); /* Ensure banner.url is defined */
             background-size: cover;
             background-position: center;
             height: 200px;
@@ -77,12 +77,12 @@
     </style>
 
     <div class="profile-header">
-        <img src="{{ user.avatar.url }}" alt="Avatar" class="profile-avatar"> <!-- Show user avatar -->
+        <img src="{{ user_profile.avatar.url }}" alt="Avatar" class="profile-avatar"> <!-- Show user avatar -->
     </div>
 
     <div class="profile-content">
         <div class="profile-info">
-            <form action="{% url 'profile' user.username %}" method="POST" enctype="multipart/form-data">
+            <form action="{% url 'test_s3_upload' %}" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 <label for="banner">Banner:</label>
                 <input type="file" name="banner" id="banner"><br><br>
@@ -100,9 +100,10 @@
                 <span id="karma">100</span><br><br> <!-- Karma is static in this example -->
 
                 <label for="about">About:</label><br>
-                <textarea name="about" id="about">{{ user.about }}</textarea><br><br>
+                <textarea name="about" id="about">{{ user_profile.about }}</textarea><br><br>
 
                 <button type="submit" class="update-btn">Update</button>
+                
             </form>
         </div>
 

@@ -40,8 +40,8 @@ class Submission(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    avatar = models.ImageField(upload_to='avatars/', default='avatars/default_avatar.png')
-    banner = models.ImageField(upload_to='banners/', default='banners/default_banner.jpg')
+    avatar = models.ImageField(upload_to='avatars/', max_length=255, default='avatars/default_avatar.png')
+    banner = models.ImageField(upload_to='banners/', max_length=255, default='banners/default_banner.jpg')
     about = models.TextField(blank=True, null=True)
 
     # Solución a los conflictos con las relaciones
@@ -70,6 +70,7 @@ class Comment(models.Model):
     hidden_by = models.ManyToManyField(User, related_name='hidden_comments', blank=True)
     voters = models.ManyToManyField(User, related_name='voted_comments', blank=True)
     points = models.IntegerField(default=0)
+    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='replies')
 
     def __str__(self):
         return self.text

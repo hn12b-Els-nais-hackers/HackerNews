@@ -5,7 +5,54 @@ from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from .forms import ProfileForm 
+from .forms import ProfileImageForm
+from django.shortcuts import HttpResponse
+from django.conf import settings
+import boto3
+
+@login_required
+def test_s3_upload(request):
+    user_profile = get_object_or_404(UserProfile, user=request.user)
+    s3 = boto3.client(
+        's3',
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+        aws_session_token=getattr(settings, 'AWS_SESSION_TOKEN', None),
+        region_name=settings.AWS_S3_REGION_NAME,
+    )
+
+    if request.method == 'POST' and 'avatar' in request.FILES:
+        avatar_file = request.FILES['avatar']
+        s3_key = f"avatars/{avatar_file.name}"
+
+        try:
+            # Upload avatar to S3
+            s3.upload_fileobj(avatar_file, settings.AWS_STORAGE_BUCKET_NAME, s3_key)
+
+            # Update UserProfile with the new avatar URL
+            user_profile.avatar = s3_key
+            user_profile.save()
+
+        except Exception as e:
+            return HttpResponse(f"Error uploading avatar: {e}")
+
+    if request.method == 'POST' and 'banner' in request.FILES:
+        banner_file = request.FILES['banner']
+        s3_key = f"banners/{banner_file.name}"
+
+        try:
+            # Upload banner to S3
+            s3.upload_fileobj(banner_file, settings.AWS_STORAGE_BUCKET_NAME, s3_key)
+
+            # Update UserProfile with the new banner URL
+            user_profile.banner = s3_key
+            user_profile.save()
+
+        except Exception as e:
+            return HttpResponse(f"Error uploading banner: {e}")
+
+    # Redirect back to the profile page after the upload
+    return redirect('profile', username=request.user.username)
 
 # Pàgina principal: mostra les submissions ordenades per punts
 def news(request):
@@ -22,7 +69,7 @@ def newest(request):
     return render(request, 'News/newest.html', {'submissions': submissions})
 
 # Pàgina de submit: permet a l'usuari crear una nova submission
-@login_required  
+@login_required
 def submit(request):
     if request.method == 'POST':
         form = SubmissionForm(request.POST)
@@ -184,19 +231,20 @@ def create_comment(request, submission_id):
 
 @login_required
 def profile_view(request, username):
-    # Fetch the User instance using the provided username
     user = get_object_or_404(User, username=username)
-    
-    # Now fetch the UserProfile using the User instance
-    user_profile = get_object_or_404(UserProfile, user_id=user.id)
+    user_profile = get_object_or_404(UserProfile, user=user)
 
     if request.method == 'POST':
-        form = ProfileForm(request.POST, request.FILES, instance=user_profile)
+        form = ProfileImageForm(request.POST, request.FILES, instance=user_profile)
         if form.is_valid():
+            # Saving the form will automatically handle S3 upload based on 'upload_to' path
             form.save()
-            return redirect('profile', username=user.username)  # Redirect to the profile page after saving
+            print("Avatar URL after save:", user_profile.avatar.url)  # Should print correct S3 URL
+            return redirect('profile', username=user.username)
+        else:
+            print("Form errors:", form.errors)
     else:
-        form = ProfileForm(instance=user_profile)
+        form = ProfileImageForm(instance=user_profile)
 
     return render(request, 'News/profile.html', {'form': form, 'user_profile': user_profile, 'user': user})
 
@@ -319,4 +367,3 @@ def unhide_comment(request, comment_id):
     comment.hidden_by.remove(request.user)
     comment.save()
     return redirect('submission_comments', submission_id=comment.submission.id)
-
