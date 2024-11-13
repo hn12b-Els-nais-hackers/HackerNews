@@ -9,6 +9,7 @@ from .forms import ProfileImageForm
 from django.shortcuts import HttpResponse
 from django.conf import settings
 import boto3
+from django.contrib import messages
 
 @login_required
 def test_s3_upload(request):
@@ -110,11 +111,19 @@ def edit_submission(request, submission_id):
     return render(request, 'News/edit_submission.html', {'form': form, 'submission': submission})
 
 # Pagina de confirmació per eliminar una submission
+@login_required
 def delete_submission(request, submission_id):
     submission = get_object_or_404(Submission, id=submission_id)
+    
+    # Verificar si el usuario actual es el autor de la submission
+    if request.user != submission.user:
+        messages.error(request, "You can't delete this submission because you're not the author.")
+        return redirect('newest')
+        
     if request.method == 'POST':
         submission.delete()
-        return redirect('newest')  # Redirigeix a la vista "newest" després d'eliminar
+        messages.success(request, 'Submission deleted successfully.')
+        return redirect('newest')
 
     return render(request, 'News/delete_submission.html', {'submission': submission})
 
@@ -147,15 +156,25 @@ def ask(request):
     return render(request, 'News/ask.html')
 
 def comments(request):
-    # Obtener todos los comentarios ordenados por fecha de creación
-    comments = Comment.objects.select_related('author', 'submission').order_by('-created_at')
+    comments = Comment.objects.all().order_by('-created_at')
     return render(request, 'News/comments.html', {'comments': comments})
 
 def login(request):
     return render(request, 'News/login.html')
 
+@login_required
 def threads(request):
-    return render(request, 'News/threads.html')
+    comments = Comment.objects.filter(author=request.user).order_by('-created_at')
+    
+    # Crear una lista de comentarios con información de next/prev
+    comments_list = list(comments)
+    for i, comment in enumerate(comments_list):
+        if i > 0:
+            comment.previous_comment = comments_list[i-1]
+        if i < len(comments_list) - 1:
+            comment.next_comment = comments_list[i+1]
+    
+    return render(request, 'News/threads.html', {'comments': comments_list})
 
 def add_comment(request):
     form = CommentForm(request.POST)
@@ -170,9 +189,23 @@ def all_comments(request):
 @login_required
 def submission_comments(request, submission_id):
     submission = get_object_or_404(Submission, id=submission_id)
-    comments = submission.submission_comments.exclude(hidden_by=request.user) 
+    comments = submission.submission_comments.exclude(hidden_by=request.user)
+    context_comment_id = request.GET.get('context')
     
-    # Manejar el voto
+    # Si hay un context_comment_id, obtener el comentario y sus ancestros
+    context_comment = None
+    context_tree = []
+    if context_comment_id:
+        try:
+            context_comment = Comment.objects.get(id=context_comment_id)
+            current = context_comment
+            while current.parent:
+                context_tree.append(current.parent)
+                current = current.parent
+        except Comment.DoesNotExist:
+            pass
+    
+    # Manejar el voto (mantener el código existente)
     if request.method == 'POST':
         action = request.POST.get('action')
         if action == 'vote':
@@ -199,6 +232,8 @@ def submission_comments(request, submission_id):
     return render(request, 'News/submission_comments.html', {
         'submission': submission,
         'comments': comments,
+        'context_comment': context_comment,
+        'context_tree': context_tree,
     })
 
 @login_required

@@ -1,12 +1,17 @@
 {% extends "News/base.html" %}
 
 {% block content %}
-    <h2>Confirm Deletion</h2>
-    <p>Are you sure you want to delete the submission titled "{{ submission.title }}"?</p>
+    {% if user == submission.user %}
+        <h2>Confirm Deletion</h2>
+        <p>Are you sure you want to delete the submission titled "{{ submission.title }}"?</p>
 
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit">Yes</button>
-        <a href="{% url 'newest' %}">Cancel</a>
-    </form>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit">Yes</button>
+            <a href="{% url 'newest' %}">Cancel</a>
+        </form>
+    {% else %}
+        <p>You don't have permission to delete this submission.</p>
+        <a href="{% url 'newest' %}">Back to submissions</a>
+    {% endif %}
 {% endblock %}
