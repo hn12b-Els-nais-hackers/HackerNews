@@ -79,14 +79,16 @@ def user_profile(request, user_id):
 
 # Pàgina principal: mostra les submissions ordenades per punts
 def news(request):
-    submissions = Submission.objects.all().order_by('-points')  # Ordena per punts
+    # Excluir submissions de tipo 'ask'
+    submissions = Submission.objects.filter(submission_type='url').order_by('-points')
     if request.user.is_authenticated:
-        submissions = submissions.exclude(hidden_by=request.user).order_by('-points')
+        submissions = submissions.exclude(hidden_by=request.user)
     return render(request, 'News/news.html', {'submissions': submissions})
 
 # Pàgina de submissions més recents: mostra les submissions ordenades per data de creació
 def newest(request):
-    submissions = Submission.objects.all().order_by('-created_at')  # Ordena per més recent
+    # Excluir submissions de tipo 'ask'
+    submissions = Submission.objects.filter(submission_type='url').order_by('-created_at')
     if request.user.is_authenticated:
         submissions = submissions.exclude(hidden_by=request.user)
     return render(request, 'News/newest.html', {'submissions': submissions})
@@ -168,7 +170,10 @@ def search(request):
     return render(request, 'News/search_results.html', {'submissions': submissions, 'query': query})
 
 def ask(request):
+    # Solo mostrar submissions de tipo 'ask'
     ask_submissions = Submission.objects.filter(submission_type='ask').order_by('-created_at')
+    if request.user.is_authenticated:
+        ask_submissions = ask_submissions.exclude(hidden_by=request.user)
     return render(request, 'News/ask.html', {'submissions': ask_submissions})
 
 def comments(request):

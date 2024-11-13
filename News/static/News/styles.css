@@ -65,7 +65,7 @@ pre:hover { overflow:auto }
   height: 10px;
   border: 0;
   margin: 3px 2px 6px;
-  background: url("images/triangle.svg") no-repeat center;
+  background: url("triangle.svg") no-repeat center;
   background-size: contain;
   display: inline-block;
 }
