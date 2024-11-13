@@ -41,9 +41,9 @@
                                 {{ submission.created_at|timesince }} ago
                             </span>
                             {% if user.is_authenticated and submission in user.voted_submissions.all %}
-                                | <a href="{% url 'unvote_submission' submission.id %}">unvote</a>
+                                | <a href="{% url 'unvote_submission' submission.id %}?next={{ request.path }}">unvote</a>
                             {% endif %}
-                            | <a href="{% url 'hide_submission' submission.id %}?next=news">hide</a> | <a href="{% url 'submission_comments' submission.id %}">{{ submission.comment_count }} comments</a>
+                            | <a href="{% url 'hide_submission' submission.id %}?next=news">hide</a> | <a href="{% url 'submission_comments' submission.id %}">{{ submission.submission_comments.count }} comments</a>
                             | <a href="{% url 'edit_submission' submission.id %}">edit</a>
                             | <a href="{% url 'delete_submission' submission.id %}">delete</a>
                             <!-- IMPLEMENTACIÓ AMB L'USUARI LOGUEJAT -->

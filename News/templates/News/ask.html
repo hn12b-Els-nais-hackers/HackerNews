@@ -1,8 +1,59 @@
+<!-- News/templates/News/ask.html -->
 {% extends 'News/base.html' %}
 
-{% block title %}ask{% endblock %}
+{% block title %}Ask | Hacker News{% endblock %}
 
 {% block content %}
-    <h2>Ask</h2>
-    <p>This is a simple implementation of a ask aggregation site similar to Hacker News.</p>
+    <center>
+        <table border="0" cellpadding="0" cellspacing="0" width="85%" bgcolor="#f6f6ef">
+            <tr>
+                <td>
+                    <table border="0" cellpadding="0" cellspacing="0">
+                        {% for submission in submissions %}
+                        <tr class='athing' id='{{ submission.id }}'>
+                            <td align="right" valign="top" class="title">
+                                <span class="rank">{{ forloop.counter }}.</span>
+                            </td>
+                            <td valign="top" class="votelinks">
+                                <center>
+                                    {% if user.is_authenticated and submission not in user.voted_submissions.all %}
+                                        <a id="up_{{ submission.id }}" href="{% url 'upvote_submission' submission.id %}?next=ask">
+                                            <div class="votearrow" title="upvote"></div>
+                                        </a>
+                                    {% endif %}
+                                </center>
+                            </td>
+                            <td class="title">
+                                <span class="titleline">
+                                    <a href="{% url 'submission_comments' submission.id %}">{{ submission.title }}</a>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"></td>
+                            <td class="subtext">
+                                <span class="score" id="score_{{ submission.id }}">{{ submission.points }} points</span>
+                                <span class="age">{{ submission.created_at|timesince }} ago</span>
+                                {% if user.is_authenticated and submission in user.voted_submissions.all %}
+                                    | <a href="{% url 'unvote_submission' submission.id %}?next={{ request.path }}">unvote</a>
+                                {% endif %}
+                                | <a href="{% url 'submission_comments' submission.id %}">{{ submission.submission_comments.count }} comments</a>
+                                | <a href="{% url 'hide_submission' submission.id %}?next=ask">hide</a>
+                                {% if user == submission.user %}
+                                    | <a href="{% url 'edit_submission' submission.id %}">edit</a>
+                                    | <a href="{% url 'delete_submission' submission.id %}">delete</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr class="spacer" style="height:5px"></tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3">No submissions available.</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </center>
 {% endblock %}

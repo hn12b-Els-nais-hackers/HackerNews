@@ -23,14 +23,19 @@
                                     </td>
                                     <td style="line-height:12pt; height:10px;">
                                         <span class="pagetop">
-                                            <b class="hnname">
-                                                <a href="{% url 'news' %}">Hacker News</a>
-                                            </b>
-                                            <a href="{% url 'newest' %}">new</a>
-                                            | <a href="{% url 'threads' %}">threads</a>
-                                            | <a href="{% url 'comments' %}">comments</a>
-                                            | <a href="{% url 'ask' %}">ask</a>
-                                            | <a href="{% url 'submit' %}" rel="nofollow">submit</a>
+                                            <div style="display: flex; align-items: center; gap: 10px;">
+                                                <a href="{% url 'news' %}"><b>Hacker News</b></a>
+                                                <a href="{% url 'newest' %}">new</a> |
+                                                <a href="{% url 'threads' %}">threads</a> |
+                                                <a href="{% url 'comments' %}">comments</a> |
+                                                <a href="{% url 'ask' %}">ask</a> |
+                                                <a href="{% url 'submit' %}" rel="nofollow">submit</a>
+                                                <form method="get" action="{% url 'search' %}" style="display: inline; margin-left: 10px;">
+                                                    Search: 
+                                                    <input type="text" name="q" size="17" autocorrect="off" spellcheck="false" autocapitalize="off" autocomplete="off">
+                                                    <button type="submit">Search</button>
+                                                </form>
+                                            </div>
                                         </span>
                                     </td>
                                     <td style="text-align: right; padding-right: 4px;">

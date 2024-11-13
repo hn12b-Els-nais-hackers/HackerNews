@@ -10,6 +10,7 @@ from django.shortcuts import HttpResponse
 from django.conf import settings
 import boto3
 from django.contrib import messages
+from django.db import models
 
 @login_required
 def test_s3_upload(request):
@@ -21,6 +22,12 @@ def test_s3_upload(request):
         aws_session_token=getattr(settings, 'AWS_SESSION_TOKEN', None),
         region_name=settings.AWS_S3_REGION_NAME,
     )
+
+    # Update about field if it's part of the POST data
+    if request.method == 'POST' and 'about' in request.POST:
+        about_text = request.POST['about']
+        user_profile.about = about_text  # Update the about field
+        user_profile.save()
 
     if request.method == 'POST' and 'avatar' in request.FILES:
         avatar_file = request.FILES['avatar']
@@ -76,13 +83,16 @@ def submit(request):
         form = SubmissionForm(request.POST)
         if form.is_valid():
             submission = form.save(commit=False)
-            submission.created_at = timezone.now()  # Assigna la data actual
-            submission.points = 0  # Inicialment 0 punts
-            #submission.author = request.user  # Suposant que tens l'usuari loguejat
+            submission.created_at = timezone.now()
+            submission.points = 0
             submission.user = request.user
             submission.save()
-            form.save()
-            return redirect('newest')  # Redirigeix a la pàgina newest després de crear la submission
+
+            # Redirect based on submission type
+            if submission.submission_type == 'ask':
+                return redirect('ask')
+            else:
+                return redirect('newest')
     else:
         form = SubmissionForm()
     return render(request, 'News/submit.html', {'form': form})
@@ -137,7 +147,8 @@ def search(request):
     return render(request, 'News/search_results.html', {'submissions': submissions, 'query': query})
 
 def ask(request):
-    return render(request, 'News/ask.html')
+    ask_submissions = Submission.objects.filter(submission_type='ask').order_by('-created_at')
+    return render(request, 'News/ask.html', {'submissions': ask_submissions})
 
 def comments(request):
     comments = Comment.objects.all().order_by('-created_at')
@@ -253,19 +264,22 @@ def profile_view(request, username):
     user = get_object_or_404(User, username=username)
     user_profile = get_object_or_404(UserProfile, user=user)
 
+    submission_karma = Submission.objects.filter(user=user).aggregate(total_points=models.Sum('points'))['total_points'] or 0
+    comment_karma = Comment.objects.filter(author=user).aggregate(total_points=models.Sum('points'))['total_points'] or 0
+    total_karma = submission_karma + comment_karma
+
     if request.method == 'POST':
         form = ProfileImageForm(request.POST, request.FILES, instance=user_profile)
         if form.is_valid():
             # Saving the form will automatically handle S3 upload based on 'upload_to' path
             form.save()
-            print("Avatar URL after save:", user_profile.avatar.url)  # Should print correct S3 URL
             return redirect('profile', username=user.username)
         else:
             print("Form errors:", form.errors)
     else:
         form = ProfileImageForm(instance=user_profile)
 
-    return render(request, 'News/profile.html', {'form': form, 'user_profile': user_profile, 'user': user})
+    return render(request, 'News/profile.html', {'form': form, 'user_profile': user_profile, 'user': user, 'karma': total_karma})
 
 # Pàgina de submissions de l'usuari: mostra les submissions de l'usuari
 def user_submissions(request, username):
