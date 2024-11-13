@@ -164,10 +164,21 @@ def delete_submission(request, submission_id):
 def search(request):
     query = request.GET.get('q', '')
     if query:
-        submissions = Submission.objects.filter(title__icontains=query)
+        # Buscar solo en el título
+        submissions = Submission.objects.filter(
+            title__icontains=query
+        ).order_by('-created_at')
+        
+        # Si el usuario está autenticado, excluir las submissions ocultas
+        if request.user.is_authenticated:
+            submissions = submissions.exclude(hidden_by=request.user)
     else:
-        submissions = Submission.objects.none()  # Si no hi ha consulta, retorna un queryset buit
-    return render(request, 'News/search_results.html', {'submissions': submissions, 'query': query})
+        submissions = Submission.objects.none()
+    
+    return render(request, 'News/search_results.html', {
+        'submissions': submissions, 
+        'query': query
+    })
 
 def ask(request):
     # Solo mostrar submissions de tipo 'ask'

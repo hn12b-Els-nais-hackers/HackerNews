@@ -2,74 +2,31 @@
 
 {% extends 'News/base.html' %}
 
-{% block title %}Search Results{% endblock %}
-
 {% block content %}
-<h2>Search Results for "{{ query }}"</h2>
-{% if submissions %}
-    <ol>
-    {% for submission in submissions %}
-    <table border="0" cellpadding="0" cellspacing="0" width="85%" bgcolor="#f6f6ef">
-        <tr>
-            <td>
-                <table border="0" cellpadding="0" cellspacing="0">
-                    {% for submission in submissions %}
-                    <tr class='athing' id='{{ submission.id }}'>
-                        <td align="right" valign="top" class="title">
-                            <span class="rank">{{ forloop.counter }}.</span>
-                        </td>
-                        <td valign="top" class="votelinks">
-                            <center>
-                                {% if user.is_authenticated and submission not in user.voted_submissions.all %}
-                                    <a id="up_{{ submission.id }}" href="{% url 'upvote_submission' submission.id %}?next=news">
-                                        <div class="votearrow" title="upvote"></div>
-                                    </a>
-                                {% endif %}
-                            </center>
-                        </td>
-                        <td class="title">
-                            <span class="titleline">
-                                <a href="{{ submission.url }}" rel="nofollow">{{ submission.title }}</a>
-                                {% if submission.domain %}
-                                <span class="sitebit comhead">(<span class="sitestr">{{ submission.domain }}</span>)</span>
-                                {% endif %}
-                            </span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2"></td>
-                        <td class="subtext">
-                            <span class="score" id="score_{{ submission.id }}">{{ submission.points }} points</span>
-                            by <a href="{% url 'user_profile' submission.user.id %}" class="hnuser">{{ submission.user.username }}</a>
-                            <span class="age" title="{{ submission.created_at|date:'Y-m-d H:i:s' }}">
-                                {{ submission.created_at|timesince }} ago
-                            </span>
-                            {% if user.is_authenticated and submission in user.voted_submissions.all %}
-                                | <a href="{% url 'unvote_submission' submission.id %}">unvote</a>
-                            {% endif %}
-                            | <a href="{% url 'hide_submission' submission.id %}?next=news">hide</a> | <a href="{% url 'submission_comments' submission.id %}">{{ submission.comment_count }} comments</a>
-                            | <a href="{% url 'edit_submission' submission.id %}">edit</a>
-                            | <a href="{% url 'delete_submission' submission.id %}">delete</a>
-                            <!-- IMPLEMENTACIÓ AMB L'USUARI LOGUEJAT -->
-                            <!--{% if submission.user == request.user %}-->
-                            <!--| <a href="{% url 'edit_submission' submission.id %}">edit</a>-->
-                            <!--| <a href="{% url 'delete_submission' submission.id %}">delete</a>-->
-                            <!--{% endif %}-->
-                        </td>
-                    </tr>
-                    <tr class="spacer" style="height:5px"></tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="3">No submissions available.</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </td>
-        </tr>
-    </table>
-    {% endfor %}
-    </ol>
-{% else %}
-    <p>No results found for "{{ query }}".</p>
-{% endif %}
+<div class="search-results">
+    {% if query %}
+        <h2>Search results for "{{ query }}"</h2>
+        {% if submissions %}
+            {% for submission in submissions %}
+                <div class="submission">
+                    <div class="title">
+                        {% if submission.url %}
+                            <a href="{{ submission.url }}">{{ submission.title }}</a>
+                        {% else %}
+                            <a href="{% url 'submission_comments' submission.id %}">{{ submission.title }}</a>
+                        {% endif %}
+                    </div>
+                    <div class="subtext">
+                        {{ submission.points }} points by 
+                        <a href="{% url 'profile' submission.user.username %}">{{ submission.user.username }}</a>
+                        {{ submission.created_at|timesince }} ago
+                        | <a href="{% url 'submission_comments' submission.id %}">{{ submission.submission_comments.count }} comments</a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No results found.</p>
+        {% endif %}
+    {% endif %}
+</div>
 {% endblock %}
