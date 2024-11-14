@@ -21,11 +21,7 @@ DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 AWS_SESSION_TOKEN = os.getenv('AWS_SESSION_TOKEN')
-<<<<<<< HEAD
 AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
-=======
-AWS_STORAGE_BUCKET_NAME = 'labasw'
->>>>>>> 11a89a101d84677b48f090c660357f884f2b1427
 AWS_S3_REGION_NAME = 'us-east-1'  # Cambia a tu región de S3
 AWS_QUERYSTRING_AUTH = False  # Para deshabilitar las firmas de URL en archivos públicos
 
@@ -53,11 +49,7 @@ SECRET_KEY = 'django-insecure-ke=1-=z93(bu_4gf7fzf98&dhn%d04m8dut!41$f3n^u%@id#h
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-<<<<<<< HEAD
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'https://0256-84-78-248-85.ngrok-free.app', 'https://hackernews-jwl9.onrender.com']
-=======
-AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
->>>>>>> 11a89a101d84677b48f090c660357f884f2b1427
 SITE_ID = 1
 
 
