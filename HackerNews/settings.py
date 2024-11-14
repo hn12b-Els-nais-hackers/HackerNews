@@ -52,6 +52,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost', 
     '127.0.0.1', 
+    '0.0.0.0',
     'hackernews-jwl9.onrender.com',  # No 'https://'
     'https://0256-84-78-248-85.ngrok-free.app',
 ]
