@@ -48,7 +48,7 @@ SECRET_KEY = 'django-insecure-ke=1-=z93(bu_4gf7fzf98&dhn%d04m8dut!41$f3n^u%@id#h
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'https://0256-84-78-248-85.ngrok-free.app']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 SITE_ID = 1
 
 
