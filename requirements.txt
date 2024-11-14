@@ -1,6 +1,6 @@
 asgiref==3.8.1
-boto3==1.35.59
-botocore==1.35.59
+boto3==1.35.58
+botocore==1.35.58
 certifi==2024.8.30
 cffi==1.17.1
 charset-normalizer==3.4.0
@@ -15,6 +15,7 @@ pillow==11.0.0
 pycparser==2.22
 PyJWT==2.9.0
 python-dateutil==2.9.0.post0
+python-dotenv==1.0.1
 python3-openid==3.2.0
 requests==2.32.3
 requests-oauthlib==2.0.0
@@ -23,5 +24,6 @@ six==1.16.0
 social-auth-app-django==5.4.2
 social-auth-core==4.5.4
 sqlparse==0.5.1
+typing_extensions==4.12.2
 tzdata==2024.2
 urllib3==2.2.3
