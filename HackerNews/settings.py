@@ -17,9 +17,9 @@ from pathlib import Path
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 # Configuración de S3
-AWS_ACCESS_KEY_ID = "ASIAQ2NVUYZ544KOODMY"
-AWS_SECRET_ACCESS_KEY = "xmU3/oUAkEngOf4zXsorIZfjllAKY21F3gXAB0zf"
-AWS_SESSION_TOKEN = "IQoJb3JpZ2luX2VjEFUaCXVzLXdlc3QtMiJGMEQCIGN7neN86iruSFutWFd1JF6zicFXeRNJP9IBQUYhYF8JAiAMmlwwF+r1P+zQh0Hv52tZDmdiXQcpei9klLHb9FzfEirEAgje//////////8BEAAaDDA1Njc1MjM5MTgwMyIMLBi+brJ0uE9ItSCYKpgCtLv4zIOoHpzmMCxMbJfmJdyVV3ABt9NaUV+ikouY2OZSKZld/jOcz6sWgWUgdevi5qJhZR3jqfLzqMDguwtpc0pophy+jDZe8FBVNlXxXceT8sNeLPxkZDIFljZGV0AcGk/vRfuqMdyMYSGilEZB7masNV4DDxOCGn8jPAG941f3j9SbHUv8ORxVbLkoP30K/PnYcXv/niDkVrNfJXScg/LcDJ4U753aTgIBpC5OKCj+L6fAnB+eYWPGtVgXK+G3mkEvsv1mjG/Lp3NtUNuocH6ClmzSbKOIsCHUYDLi8n3pZCF1AEd/slwA+e7Rr4+J6gqPUuRXsmBnFWersyzujDVBw1g0qNHA+A/d6YI+OBrQXfCKltR91jDyptS5BjqeAbYFrmh3U3XmgyPUiRa2eXrs6aLlUL6xhQIHKNfxNLzvZYbUaEdb4raBn5H81CodOrZzInvIZjz/zvQ6hMqqzgmy/Obu5aURotdtY+qpXbKrj0WbyqfPvb3knS9jLyVBnyrRmHWeNhaxrvLYJAiMV9gy4aeLLx6+toLSdhun0CA2+RCSRylQVJufs8+86WiYFWtcpY01wDQn1ZWKR9vR"
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_SESSION_TOKEN = os.getenv('AWS_SESSION_TOKEN')
 AWS_STORAGE_BUCKET_NAME = 'labasw'
 AWS_S3_REGION_NAME = 'us-east-1'  # Cambia a tu región de S3
 AWS_QUERYSTRING_AUTH = False  # Para deshabilitar las firmas de URL en archivos públicos
