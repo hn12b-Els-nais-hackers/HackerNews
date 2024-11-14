@@ -80,6 +80,11 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',  # to use Django's built-in user auth
 )
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://hackernews-jwl9.onrender.com',
+    'http://localhost:8000',  # Local development
+    'http://127.0.0.1:8000',  # Local development
+]
 
 
 MIDDLEWARE = [
