@@ -48,7 +48,7 @@ SECRET_KEY = 'django-insecure-ke=1-=z93(bu_4gf7fzf98&dhn%d04m8dut!41$f3n^u%@id#h
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 SITE_ID = 1
 
 
