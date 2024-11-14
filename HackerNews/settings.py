@@ -34,6 +34,8 @@ MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
 
 
 
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -48,7 +50,6 @@ SECRET_KEY = 'django-insecure-ke=1-=z93(bu_4gf7fzf98&dhn%d04m8dut!41$f3n^u%@id#h
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 SITE_ID = 1
 
 
