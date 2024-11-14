@@ -14,14 +14,16 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
+load_dotenv()
+
 # Configura el backend de almacenamiento predeterminado para S3
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 # Configuración de S3
-AWS_ACCESS_KEY_ID = os.getenv('../AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.getenv('../AWS_SECRET_ACCESS_KEY')
-AWS_SESSION_TOKEN = os.getenv('../AWS_SESSION_TOKEN')
-AWS_STORAGE_BUCKET_NAME = os.getenv('../AWS_STORAGE_BUCKET_NAME')
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_SESSION_TOKEN = os.getenv('AWS_SESSION_TOKEN')
+AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
 AWS_S3_REGION_NAME = 'us-east-1'  # Cambia a tu región de S3
 AWS_QUERYSTRING_AUTH = False  # Para deshabilitar las firmas de URL en archivos públicos
 
