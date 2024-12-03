@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
+
 from .models import Submission, UserProfile, Comment
 from .serializers import (
     SubmissionSerializer,
@@ -13,6 +14,7 @@ from .serializers import (
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
+from rest_framework_api_key.authentication import APIKeyAuthentication
 
 
 class SubmissionViewSet(viewsets.ModelViewSet):
@@ -22,6 +24,7 @@ class SubmissionViewSet(viewsets.ModelViewSet):
     queryset = Submission.objects.all()
     serializer_class = SubmissionSerializer
     permission_classes = [IsAuthenticated]
+    authentication_classes = [APIKeyAuthentication]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -56,6 +59,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticated]
+    authentication_classes = [APIKeyAuthentication]
 
     def perform_create(self, serializer):
         submission_id = self.request.data.get("submission")
