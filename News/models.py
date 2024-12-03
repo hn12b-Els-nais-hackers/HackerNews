@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+import uuid
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
@@ -43,6 +44,7 @@ class UserProfile(models.Model):
     avatar = models.ImageField(upload_to='avatars/', max_length=255, default='avatars/default_avatar.png')
     banner = models.ImageField(upload_to='banners/', max_length=255, default='banners/default_banner.jpg')
     about = models.TextField(blank=True, null=True)
+    api_key = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # Campo para la API key
 
     # Solución a los conflictos con las relaciones
     groups = models.ManyToManyField(

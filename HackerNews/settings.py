@@ -65,6 +65,10 @@ SITE_ID = 1
 # Application definition
 
 INSTALLED_APPS = [
+    'drf_yasg',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
     'storages',
     'News',
     'django.contrib.sites',
@@ -76,6 +80,16 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
 
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.google.GoogleOAuth2',  # for Google
@@ -99,6 +113,12 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+MIDDLEWARE += ['corsheaders.middleware.CorsMiddleware']
+CORS_ALLOWED_ORIGINS = [
+    "http://editor.swagger.io",
+    "http://127.0.0.1:8000",  # Adjust as needed
+]
+MIDDLEWARE += ['News.middleware.APIKeyAuthMiddleware']
 
 # Google OAuth keys from the Google Developer Console
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '971326311730-3nv4n4d8gm5i8jlbt2jqof9n08gqvmgc.apps.googleusercontent.com'

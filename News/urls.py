@@ -1,16 +1,46 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 from django.contrib.auth import views as auth_views
 from django.conf import settings
 from django.conf.urls.static import static
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
 
+# Define the Swagger API key authentication
+security_definitions = {
+    'Api-Key': {
+        'type': 'apiKey',
+        'in': 'header',
+        'name': 'Api-Key',
+    }
+}
+
+# Set up Swagger schema view
+schema_view = get_schema_view(
+    openapi.Info(
+        title="News API",
+        default_version='v1',
+        description="News API documentation",
+        terms_of_service="https://www.google.com/policies/terms/",
+        contact=openapi.Contact(email="contact@news.local"),
+        license=openapi.License(name="MIT"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+    patterns=[path('api/', include('News.api_urls'))],
+)
+
+# Define URL patterns
 urlpatterns = [
-    path('', views.news, name='news'),             
-    path('newest/', views.newest, name='newest'),   
-    path('submit/', views.submit, name='submit'), 
+    path('api/', include('News.api_urls')),
+    path('swagger/', schema_view.as_view(), name='swagger-docs'),
+    path('', views.news, name='news'),
+    path('newest/', views.newest, name='newest'),
+    path('submit/', views.submit, name='submit'),
     path('ask/', views.ask, name='ask'),
-    path('comments/', views.comments, name='comments'), 
-    path('login/', views.login, name='login'),   
+    path('comments/', views.comments, name='comments'),
+    path('login/', views.login, name='login'),
     path('threads/', views.threads, name='threads'),
     path('login/', auth_views.LoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
@@ -21,8 +51,6 @@ urlpatterns = [
     path('submission/<int:submission_id>/delete/', views.delete_submission, name='delete_submission'),
     path('user/<int:user_id>/', views.user_profile, name='user_profile'),
     path('search/', views.search, name='search'),
-
-    # Página de perfil del usuario
     path('profile/<str:username>/', views.profile_view, name='profile'),
     path('profile/<str:username>/submissions/', views.user_submissions, name='user_submissions'),
     path('user/<str:username>/comments/', views.user_comments, name='user_comments'),
@@ -41,5 +69,4 @@ urlpatterns = [
     path('hide/comment/<int:comment_id>/', views.hide_comment, name='hide_comment'),
     path('unhide/comment/<int:comment_id>/', views.unhide_comment, name='unhide_comment'),
     path('test-upload/', views.test_s3_upload, name='test_s3_upload'),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  
-
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
