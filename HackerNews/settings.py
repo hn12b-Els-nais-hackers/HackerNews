@@ -107,18 +107,28 @@ MIDDLEWARE = [
     'social_django.middleware.SocialAuthExceptionMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-MIDDLEWARE += ['corsheaders.middleware.CorsMiddleware']
 CORS_ALLOWED_ORIGINS = [
-    "http://editor.swagger.io",
+    "https://editor.swagger.io",
+    "https://hackernews-jwl9.onrender.com",
     "http://127.0.0.1:8000",  # Adjust as needed
 ]
 MIDDLEWARE += ['News.middleware.APIKeyAuthMiddleware']
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Api-Key': {
+            'type': 'apiKey',
+            'name': 'Api-Key',
+            'in': 'header',
+        },
+    },
+}
 
 # Google OAuth keys from the Google Developer Console
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '971326311730-3nv4n4d8gm5i8jlbt2jqof9n08gqvmgc.apps.googleusercontent.com'

@@ -2,8 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from News.models import UserProfile, Submission, Comment
-from .serializers import UserProfileSerializer, SubmissionSerializer, CommentSerializer
+from .serializers import UserSerializer, UserProfileSerializer, SubmissionSerializer, CommentSerializer
 from django.shortcuts import get_object_or_404
 from .models import Submission, UserProfile, Comment
 from django.contrib.auth.models import User
