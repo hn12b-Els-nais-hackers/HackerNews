@@ -1,0 +1,421 @@
+openapi: 3.0.0
+info:
+  title: HackerNews API
+  description: API for HackerNews clone with user profiles, submissions, and comments
+  termsOfService: https://www.google.com/policies/terms/
+  contact:
+    email: contact@news.local
+  license:
+    name: MIT
+  version: v1
+
+servers:
+  - url: http://127.0.0.1:8000/api
+    description: Local development server
+  - url: https://hackernews-jwl9.onrender.com/api
+    description: Production server
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      name: Api-Key
+      in: header
+  schemas:
+    User:
+      type: object
+      required:
+        - username
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          maxLength: 150
+          minLength: 1
+          pattern: ^[\w.@+-]+$
+        email:
+          type: string
+          format: email
+          maxLength: 254
+
+    UserProfile:
+      type: object
+      required:
+        - user
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          $ref: '#/components/schemas/User'
+        avatar:
+          type: string
+          format: uri
+          readOnly: true
+        banner:
+          type: string
+          format: uri
+          readOnly: true
+        about:
+          type: string
+          nullable: true
+
+    SubmissionList:
+      type: object
+      required:
+        - title
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+          minLength: 1
+        url:
+          type: string
+          format: uri
+          maxLength: 500
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        points:
+          type: integer
+        user:
+          type: string
+          readOnly: true
+
+    Submission:
+      type: object
+      required:
+        - title
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+          minLength: 1
+        url:
+          type: string
+          format: uri
+          maxLength: 500
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        points:
+          type: integer
+        user:
+          $ref: '#/components/schemas/User'
+        submission_type:
+          type: string
+          enum: [url, ask]
+        voters:
+          type: array
+          items:
+            type: string
+            pattern: ^[\w.@+-]+$
+          uniqueItems: true
+
+    CommentCreate:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          minLength: 1
+        parent_id:
+          type: integer
+          nullable: true
+
+    Comment:
+      type: object
+      required:
+        - text
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        text:
+          type: string
+          minLength: 1
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        points:
+          type: integer
+          readOnly: true
+        author:
+          $ref: '#/components/schemas/User'
+        submission:
+          type: integer
+          readOnly: true
+        voters:
+          type: array
+          items:
+            type: integer
+          readOnly: true
+          uniqueItems: true
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /profile/{username}/:
+    get:
+      tags: [profile]
+      summary: Get user profile
+      description: Get user profile details including karma points
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User profile data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '404':
+          description: User profile not found
+    
+    post:
+      tags: [profile]
+      summary: Update user profile media
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+                banner:
+                  type: string
+                  format: binary
+                about:
+                  type: string
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+
+  /submissions/:
+    get:
+      tags: [submissions]
+      summary: List submissions
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [url, ask]
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [newest, points]
+      responses:
+        '200':
+          description: List of submissions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubmissionList'
+
+    post:
+      tags: [submissions]
+      summary: Create submission
+      description: |
+        Create a new submission. There are two types of submissions:
+        
+        1. URL submission (submission_type = "url"):
+           - Requires: title, url
+           - The url must be unique and not previously submitted
+           
+        2. Ask submission (submission_type = "ask"):
+           - Requires: title, text
+           - Used for questions or discussion topics
+           
+        The submission will automatically receive an upvote from the submitting user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, submission_type]
+              properties:
+                title:
+                  type: string
+                  description: Title of the submission
+                url:
+                  type: string
+                  description: URL for the submission (required if submission_type is "url")
+                text:
+                  type: string
+                  description: Text content (required if submission_type is "ask")
+                submission_type:
+                  type: string
+                  enum: [url, ask]
+                  description: Type of submission
+      responses:
+        '201':
+          description: Submission created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Submission'
+        '400':
+          description: Invalid submission data
+
+  /submissions/{submission_id}/comments/:
+    post:
+      tags: [submissions]
+      summary: Create comment
+      description: |
+        Create a new comment on a submission.
+        
+        Example request body:
+        {
+            "text": "Your comment text here"
+        }
+
+        For replies to other comments:
+        {
+            "text": "Your reply text here",
+            "parent_id": 123
+        }
+      parameters:
+        - name: submission_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentCreate'
+      responses:
+        '201':
+          description: Comment created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: Invalid request data
+        '404':
+          description: Submission not found
+
+  /comments/{comment_id}/:
+    post:
+      tags: [comments]
+      summary: Perform action on comment
+      parameters:
+        - name: comment_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: action
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [vote, unvote, hide, unhide, favorite, unfavorite]
+      responses:
+        '200':
+          description: Action performed successfully
+        '400':
+          description: Invalid action
+        '404':
+          description: Comment not found
+
+  /user/{username}/content/:
+    get:
+      tags: [user]
+      summary: Get user content
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: content_type
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [submissions, comments, upvoted, hidden, favorites]
+      responses:
+        '200':
+          description: User content retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubmissionList'
+        '404':
+          description: User not found
+
+  /submissions/{submission_id}/:
+    post:
+      tags: [submissions]
+      summary: Perform action on submission
+      description: Perform actions like vote, unvote, hide, unhide, favorite, or unfavorite on a submission
+      parameters:
+        - name: submission_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: action
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [vote, unvote, hide, unhide, favorite, unfavorite]
+            description: The action to perform on the submission
+      responses:
+        '200':
+          description: Action performed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Submission voted successfully"
+        '400':
+          description: Invalid action
+        '404':
+          description: Submission not found

@@ -1,3 +1,4 @@
+import uuid
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Submission, UserProfile, Comment
 from .forms import SubmissionForm, CommentForm
@@ -306,9 +307,14 @@ def profile_view(request, username):
     total_karma = submission_karma + comment_karma
 
     if request.method == 'POST':
+        if 'regenerate_api_key' in request.POST:
+            user_profile.api_key = uuid.uuid4()  # Generate a new API key
+            user_profile.save()
+            return redirect('profile', username=user.username)
+
+        # Handle profile image form submission
         form = ProfileImageForm(request.POST, request.FILES, instance=user_profile)
         if form.is_valid():
-            # Saving the form will automatically handle S3 upload based on 'upload_to' path
             form.save()
             return redirect('profile', username=user.username)
         else:

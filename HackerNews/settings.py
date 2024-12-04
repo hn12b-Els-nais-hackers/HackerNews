@@ -24,7 +24,7 @@ AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 AWS_SESSION_TOKEN = os.getenv('AWS_SESSION_TOKEN')
 AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
-AWS_S3_REGION_NAME = 'us-east-1'  # Cambia a tu región de S3
+AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME')
 AWS_QUERYSTRING_AUTH = False  # Para deshabilitar las firmas de URL en archivos públicos
 
 # Opcional: para que los archivos cargados sean públicos por defecto
@@ -57,6 +57,7 @@ ALLOWED_HOSTS = [
     '0.0.0.0',
     'hackernews-jwl9.onrender.com',  # No 'https://'
     'https://0256-84-78-248-85.ngrok-free.app',
+    '.onrender.com',
 ]
 
 SITE_ID = 1
@@ -65,6 +66,10 @@ SITE_ID = 1
 # Application definition
 
 INSTALLED_APPS = [
+    'drf_yasg',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
     'storages',
     'News',
     'django.contrib.sites',
@@ -77,6 +82,16 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.google.GoogleOAuth2',  # for Google
     'django.contrib.auth.backends.ModelBackend',  # to use Django's built-in user auth
@@ -84,13 +99,13 @@ AUTHENTICATION_BACKENDS = (
 
 CSRF_TRUSTED_ORIGINS = [
     'https://hackernews-jwl9.onrender.com',
-    'http://localhost:8000',  # Local development
-    'http://127.0.0.1:8000',  # Local development
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
 ]
 
 
 MIDDLEWARE = [
-    'social_django.middleware.SocialAuthExceptionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -98,7 +113,53 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'News.middleware.APIKeyAuthMiddleware',
 ]
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
+    "https://hackernews-jwl9.onrender.com",
+    "https://editor.swagger.io",
+    "https://swagger.io"
+]
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'api-key',
+]
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Api-Key': {
+            'type': 'apiKey',
+            'name': 'Api-Key',
+            'in': 'header',
+        },
+    },
+    'USE_SESSION_AUTH': False,
+    'SUPPORTED_SUBMIT_METHODS': [
+        'get',
+        'post',
+        'put',
+        'delete',
+        'patch',
+    ],
+    'CORS_ALLOW_ORIGIN': '*',
+}
 
 # Google OAuth keys from the Google Developer Console
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '971326311730-3nv4n4d8gm5i8jlbt2jqof9n08gqvmgc.apps.googleusercontent.com'

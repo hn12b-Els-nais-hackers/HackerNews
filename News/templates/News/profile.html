@@ -82,6 +82,16 @@
 
     <div class="profile-content">
         <div class="profile-info">
+
+            <form method="post" action="{% url 'profile' username=user.username %}">
+                {% csrf_token %}
+                <button type="submit" name="regenerate_api_key" class="btn btn-danger">
+                    Regenerate API Key
+                </button>
+                <label for="api-key">API Key:</label>
+                <span id="api-key">{{ user_profile.api_key }}</span><br><br>
+            </form>
+
             <form action="{% url 'test_s3_upload' %}" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 <label for="banner">Banner:</label>
