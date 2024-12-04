@@ -7,6 +7,8 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework.routers import DefaultRouter
+from django.views.static import serve
+import os
 
 # Define the schema view
 schema_view = get_schema_view(
@@ -21,13 +23,15 @@ schema_view = get_schema_view(
     public=True,
     permission_classes=(permissions.AllowAny,),
     patterns=[path('api/', include('News.api_urls'))],
+    url='http://127.0.0.1:8000',
 )
 
 
 # Define URL patterns
 urlpatterns = [
     path('api/', include('News.api_urls')),
-    path('swagger/', schema_view.as_view(), name='swagger-docs'),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('swagger.json', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('', views.news, name='news'),
     path('newest/', views.newest, name='newest'),
     path('submit/', views.submit, name='submit'),
@@ -62,4 +66,8 @@ urlpatterns = [
     path('hide/comment/<int:comment_id>/', views.hide_comment, name='hide_comment'),
     path('unhide/comment/<int:comment_id>/', views.unhide_comment, name='unhide_comment'),
     path('test-upload/', views.test_s3_upload, name='test_s3_upload'),
+    path('api/api.yml', serve, {
+        'document_root': os.path.join(settings.BASE_DIR, 'News'),
+        'path': 'api.yml'
+    }, name='api-docs'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
