@@ -136,56 +136,35 @@ class SubmissionAPI(APIView):
                 'submission_type': openapi.Schema(
                     type=openapi.TYPE_STRING,
                     enum=['url', 'ask'],
-                    description='Type of submission. For "url" type, provide url field. For "ask" type, provide text field.'
+                    description='Type of submission'
                 ),
             }
         ),
         responses={
             201: SubmissionSerializer,
-            400: openapi.Response(
-                description="Invalid submission data",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={
-                        'error': openapi.Schema(
-                            type=openapi.TYPE_STRING,
-                            description='Error message'
-                        ),
-                        'details': openapi.Schema(
-                            type=openapi.TYPE_OBJECT,
-                            properties={
-                                'url': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_STRING)),
-                                'text': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_STRING)),
-                                'title': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_STRING)),
-                            }
-                        )
-                    }
-                )
-            )
-        },
-        operation_description="""
-        Create a new submission. There are two types of submissions:
-        
-        1. URL submission (submission_type = "url"):
-           - Requires: title, url
-           - The url must be unique and not previously submitted
-           
-        2. Ask submission (submission_type = "ask"):
-           - Requires: title, text
-           - Used for questions or discussion topics
-           
-        The submission will automatically receive an upvote from the submitting user.
-        """
+            400: 'Invalid submission data or URL already exists'
+        }
     )
     def post(self, request):
         submission_type = request.data.get('submission_type')
+        url = request.data.get('url')
         
-        # Validate required fields based on submission type
-        if submission_type == 'url' and not request.data.get('url'):
-            return Response(
-                {"error": "URL is required for URL submissions"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        # Check for duplicate URL if it's a URL submission
+        if submission_type == 'url':
+            if not url:
+                return Response(
+                    {"error": "URL is required for URL submissions"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            if Submission.objects.filter(url=url).exists():
+                return Response(
+                    {
+                        "error": "This URL has already been submitted",
+                        "url": url,
+                        "duplicate": True
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
         elif submission_type == 'ask' and not request.data.get('text'):
             return Response(
                 {"error": "Text is required for Ask submissions"},
@@ -252,6 +231,89 @@ class SubmissionDetailAPI(APIView):
             return Response({"message": f"Submission {action}d successfully"})
             
         return Response({"error": "Invalid action"}, status=status.HTTP_400_BAD_REQUEST)
+
+    @swagger_auto_schema(
+        operation_id='delete_submission',
+        responses={
+            200: openapi.Response(
+                description="Submission deleted successfully",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'message': openapi.Schema(type=openapi.TYPE_STRING),
+                        'submission_id': openapi.Schema(type=openapi.TYPE_INTEGER)
+                    }
+                )
+            ),
+            403: 'Not authorized (not the submission author)',
+            404: 'Submission not found'
+        }
+    )
+    def delete(self, request, submission_id):
+        submission = get_object_or_404(Submission, id=submission_id)
+        
+        # Check if user is the author
+        if submission.user != request.user:
+            return Response({
+                "error": "You can only delete your own submissions",
+                "submission_id": submission_id
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        # Store info before deletion    
+        submission_data = {
+            "message": "Submission deleted successfully",
+            "submission_id": submission_id,
+            "title": submission.title
+        }
+        
+        submission.delete()
+        return Response(submission_data, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_id='update_submission',
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'title': openapi.Schema(type=openapi.TYPE_STRING),
+                'url': openapi.Schema(type=openapi.TYPE_STRING),
+                'text': openapi.Schema(type=openapi.TYPE_STRING),
+                'submission_type': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    enum=['url', 'ask']
+                ),
+            }
+        ),
+        responses={
+            200: SubmissionSerializer,
+            400: 'Invalid data or URL already exists',
+            403: 'Not authorized (not the submission author)',
+            404: 'Submission not found'
+        }
+    )
+    def put(self, request, submission_id):
+        submission = get_object_or_404(Submission, id=submission_id)
+        
+        # Check if user is the author
+        if submission.user != request.user:
+            return Response({
+                "error": "You can only edit your own submissions",
+                "submission_id": submission_id
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        # Check for duplicate URL if URL is being changed
+        if 'url' in request.data and request.data['url'] != submission.url:
+            if Submission.objects.filter(url=request.data['url']).exists():
+                return Response({
+                    "error": "This URL has already been submitted",
+                    "url": request.data['url'],
+                    "duplicate": True
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer = SubmissionSerializer(submission, data=request.data, partial=True)
+        if serializer.is_valid():
+            submission = serializer.save()
+            return Response(SubmissionSerializer(submission).data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CommentAPI(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -365,6 +427,81 @@ class CommentDetailAPI(APIView):
             return Response({"message": f"Comment {action}d successfully"})
             
         return Response({"error": "Invalid action"}, status=status.HTTP_400_BAD_REQUEST)
+
+    @swagger_auto_schema(
+        operation_id='delete_comment',
+        responses={
+            200: openapi.Response(
+                description="Comment deleted successfully",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'message': openapi.Schema(type=openapi.TYPE_STRING),
+                        'comment_id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                        'submission_id': openapi.Schema(type=openapi.TYPE_INTEGER)
+                    }
+                )
+            ),
+            403: 'Not authorized (not the comment author)',
+            404: 'Comment not found'
+        }
+    )
+    def delete(self, request, comment_id):
+        comment = get_object_or_404(Comment, id=comment_id)
+        
+        # Check if user is the author
+        if comment.author != request.user:
+            return Response({
+                "error": "You can only delete your own comments",
+                "comment_id": comment_id,
+                "submission_id": comment.submission.id
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        # Store info before deletion
+        comment_data = {
+            "message": "Comment deleted successfully",
+            "comment_id": comment_id,
+            "submission_id": comment.submission.id
+        }
+        
+        comment.delete()
+        return Response(comment_data, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_id='update_comment',
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['text'],
+            properties={
+                'text': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description='Updated comment text'
+                )
+            }
+        ),
+        responses={
+            200: CommentSerializer,
+            400: 'Invalid data',
+            403: 'Not authorized (not the comment author)',
+            404: 'Comment not found'
+        }
+    )
+    def put(self, request, comment_id):
+        comment = get_object_or_404(Comment, id=comment_id)
+        
+        # Check if user is the author
+        if comment.author != request.user:
+            return Response({
+                "error": "You can only edit your own comments",
+                "comment_id": comment_id,
+                "submission_id": comment.submission.id
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        serializer = CommentSerializer(comment, data=request.data, partial=True)
+        if serializer.is_valid():
+            comment = serializer.save()
+            return Response(CommentSerializer(comment).data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserContentAPI(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
