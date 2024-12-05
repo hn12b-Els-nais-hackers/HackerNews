@@ -357,6 +357,57 @@ paths:
           description: Invalid action
         '404':
           description: Comment not found
+    delete:
+      tags: [comments]
+      summary: Delete comment
+      description: Delete a comment (only available to the comment's author)
+      parameters:
+        - name: comment_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Comment deleted successfully
+        '403':
+          description: Not authorized (not the comment's author)
+        '404':
+          description: Comment not found
+    put:
+      tags: [comments]
+      summary: Update comment
+      description: Update a comment (only available to the comment's author)
+      parameters:
+        - name: comment_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text:
+                  type: string
+                  description: Updated comment text
+      responses:
+        '200':
+          description: Comment updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: Invalid data
+        '403':
+          description: Not authorized (not the comment author)
+        '404':
+          description: Comment not found
 
   /user/{username}/content/:
     get:
@@ -417,5 +468,62 @@ paths:
                     example: "Submission voted successfully"
         '400':
           description: Invalid action
+        '404':
+          description: Submission not found
+    delete:
+      tags: [submissions]
+      summary: Delete submission
+      description: Delete a submission (only available to the submission's author)
+      parameters:
+        - name: submission_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Submission deleted successfully
+        '403':
+          description: Not authorized (not the submission's author)
+        '404':
+          description: Submission not found
+    put:
+      tags: [submissions]
+      summary: Update submission
+      description: Update a submission (only available to the submission's author)
+      parameters:
+        - name: submission_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                url:
+                  type: string
+                  description: Only for URL submissions
+                text:
+                  type: string
+                  description: Only for Ask submissions
+                submission_type:
+                  type: string
+                  enum: [url, ask]
+      responses:
+        '200':
+          description: Submission updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Submission'
+        '400':
+          description: Invalid data or URL already exists
+        '403':
+          description: Not authorized (not the submission author)
         '404':
           description: Submission not found
