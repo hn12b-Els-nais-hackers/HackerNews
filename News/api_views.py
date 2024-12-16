@@ -19,11 +19,11 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 import boto3
 from django.conf import settings
 from django.contrib.auth.models import User
-#from dotenv import load_dotenv
+from dotenv import load_dotenv
 import os
 
 # Load environment variables
-#load_dotenv()
+load_dotenv()
 
 class UserProfileAPI(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -63,17 +63,17 @@ class UserProfileAPI(APIView):
         user_profile = get_object_or_404(UserProfile, user__username=username)
         s3 = boto3.client(
             's3',
-            #aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
-            #aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
-            #aws_session_token=os.getenv('AWS_SESSION_TOKEN'),
-            #region_name=os.getenv('AWS_S3_REGION_NAME')
+            aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+            aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
+            aws_session_token=os.getenv('AWS_SESSION_TOKEN'),
+            region_name=os.getenv('AWS_S3_REGION_NAME')
         )
 
         for field, folder in [('avatar', 'avatars'), ('banner', 'banners')]:
             if field in request.FILES:
                 file_obj = request.FILES[field]
                 s3_key = f"{folder}/{file_obj.name}"
-                #s3.upload_fileobj(file_obj, os.getenv('AWS_STORAGE_BUCKET_NAME'), s3_key)
+                s3.upload_fileobj(file_obj, os.getenv('AWS_STORAGE_BUCKET_NAME'), s3_key)
                 setattr(user_profile, field, s3_key)
 
         if 'about' in request.data:
