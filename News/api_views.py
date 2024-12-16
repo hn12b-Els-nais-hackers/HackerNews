@@ -314,6 +314,44 @@ class SubmissionDetailAPI(APIView):
             submission = serializer.save()
             return Response(SubmissionSerializer(submission).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class SubmissionSearchAPI(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    @swagger_auto_schema(
+        operation_id='search_submissions',
+        manual_parameters=[
+            openapi.Parameter(
+                'q',
+                openapi.IN_QUERY,
+                type=openapi.TYPE_STRING,
+                required=False,
+                description='Search query for submission titles'
+            )
+        ],
+        responses={
+            200: SubmissionListSerializer(many=True),
+            404: 'No submissions found'
+        },
+        operation_description="Search for submissions by title"
+    )
+    def get(self, request):
+        submissions = Submission.objects.all()
+        print(f"submissions:{submissions}")
+        query = request.GET.get('Title of the Submission', '')
+        print(f"Search query: {query}")  # Debugging line
+        if query:
+            # Filter the submissions based on the query
+            submissions = submissions.filter(title__icontains=query)
+            print(f"Filtered submissions: {submissions}")  # Debugging line
+            
+            if request.user.is_authenticated:
+                submissions = submissions.exclude(hidden_by=request.user)
+        else:
+            submissions = Submission.objects.none()
+        
+        serializer = SubmissionListSerializer(submissions, many=True)
+        return Response(serializer.data)
 
 class CommentAPI(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
