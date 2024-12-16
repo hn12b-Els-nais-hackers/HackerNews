@@ -527,3 +527,28 @@ paths:
           description: Not authorized (not the submission author)
         '404':
           description: Submission not found
+
+  /submissions/search/:
+    get:
+      operationId: search_submissions
+      description: Search for submissions by title
+      parameters:
+        - name: Title of the Submission
+          in: query
+          description: Search query for submission titles
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of submissions matching the search query
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubmissionList'
+        '404':
+          description: No submissions found
+      tags:
+        - submissions
