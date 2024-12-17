@@ -6,7 +6,8 @@ from .api_views import (
     CommentAPI,
     CommentDetailAPI,
     UserContentAPI,
-    SubmissionSearchAPI
+    SubmissionSearchAPI,
+    SubmissionCommentsAPI,
 )
 
 urlpatterns = [
@@ -22,6 +23,7 @@ urlpatterns = [
     path('submissions/search/', SubmissionSearchAPI.as_view(), name='api-submission-search'),
 
     # Comments
-    path('submissions/<int:submission_id>/comments/', CommentAPI.as_view(), name='api-comments'),
+    path('submissions/<int:submission_id>/comments/', SubmissionCommentsAPI.as_view(), name='api-submission-comments'),
+    path('comments/', CommentAPI.as_view(), name='api-comments'),
     path('comments/<int:comment_id>/', CommentDetailAPI.as_view(), name='api-comment-detail'),
 ]

@@ -38,20 +38,22 @@ class SubmissionListSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
     submission = serializers.PrimaryKeyRelatedField(read_only=True)  # Make submission read-only
+    parent_id = serializers.IntegerField(source='parent.id', read_only=True)  # Add parent_id field
 
     class Meta:
         model = Comment
-        fields = ["id", "text", "created_at", "points", "author", "submission", "voters"]
+        fields = ["id", "text", "created_at", "points", "author", "submission", "voters", "parent_id"]  # Include parent_id
         read_only_fields = ['author', 'submission', 'points', 'voters']  # Make these fields read-only
 
 
 # Optional: For listing comments, you might use a simplified comment serializer:
 class CommentListSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField()  # Only include username (simplified representation)
+    parent_id = serializers.IntegerField(source='parent.id', read_only=True)  # Add parent_id field
 
     class Meta:
         model = Comment
-        fields = ["id", "text", "created_at", "points", "author"]
+        fields = ["id", "text", "created_at", "points", "author", "parent_id"]  # Include parent_id
 
 
 class UserProfileUpdateSerializer(serializers.ModelSerializer):

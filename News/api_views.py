@@ -353,8 +353,82 @@ class SubmissionSearchAPI(APIView):
         serializer = SubmissionListSerializer(submissions, many=True)
         return Response(serializer.data)
 
+class SubmissionCommentsAPI(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    @swagger_auto_schema(
+        operation_id='list_submission_comments',
+        manual_parameters=[
+            openapi.Parameter(
+                'submission_id',
+                openapi.IN_PATH,
+                required=True,
+                type=openapi.TYPE_INTEGER,
+                description='ID of the submission to get comments for'
+            )
+        ],
+        responses={
+            200: openapi.Response(
+                description='List of comments for the submission',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=CommentListSerializer()  # Use the updated CommentListSerializer
+                )
+            ),
+            404: 'Submission not found'
+        }
+    )
+    def get(self, request, submission_id):
+        submission = get_object_or_404(Submission, id=submission_id)
+        comments = submission.submission_comments.all()  # Use the related name defined in the Comment model
+        serializer = CommentListSerializer(comments, many=True)
+        return Response(serializer.data)
+    
+    @swagger_auto_schema(
+        operation_id='create_submission_comment',
+        request_body=CommentCreateSerializer,
+        manual_parameters=[
+            openapi.Parameter(
+                'submission_id',
+                openapi.IN_PATH,
+                required=True,
+                type=openapi.TYPE_INTEGER,
+                description='ID of the submission to comment on'
+            )
+        ],
+        responses={
+            201: CommentSerializer,
+            400: 'Invalid request data',
+            404: 'Submission not found'
+        }
+    )
+    def post(self, request, submission_id):
+        submission = get_object_or_404(Submission, id=submission_id)
+        serializer = CommentCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            comment = serializer.save(author=request.user, submission=submission)
+            return Response(CommentSerializer(comment).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 class CommentAPI(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
+
+    @swagger_auto_schema(
+        operation_id='list_comments',
+        responses={
+            200: openapi.Response(
+                description='List of all comments',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=CommentListSerializer()  # Use the updated CommentListSerializer
+                )
+            )
+        }
+    )
+    def get(self, request):
+        comments = Comment.objects.all()
+        serializer = CommentListSerializer(comments, many=True)
+        return Response(serializer.data)
 
     @swagger_auto_schema(
         operation_id='create_comment',
