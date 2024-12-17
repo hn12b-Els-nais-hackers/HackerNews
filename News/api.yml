@@ -294,6 +294,30 @@ paths:
           description: Invalid submission data
 
   /submissions/{submission_id}/comments/:
+
+    get:
+      tags: [comments]
+      summary: List comments for a submission
+      description: Retrieve all comments for a specific submission.
+      parameters:
+        - name: submission_id
+          in: path
+          required: true
+          description: ID of the submission to get comments for
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of comments for the submission
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        '404':
+          description: Submission not found
+
     post:
       tags: [submissions]
       summary: Create comment
@@ -333,6 +357,21 @@ paths:
           description: Invalid request data
         '404':
           description: Submission not found
+
+  /comments/:
+    get:
+      tags: [comments]
+      summary: List all comments
+      description: Retrieve a list of all comments in the system.
+      responses:
+        '200':
+          description: A list of comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
 
   /comments/{comment_id}/:
     post:
