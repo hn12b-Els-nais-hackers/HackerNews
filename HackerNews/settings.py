@@ -121,7 +121,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://hackernews-jwl9.onrender.com",
     "https://editor.swagger.io",
-    "https://swagger.io"
+    "https://swagger.io",
+    "https://hackernewsfront-yqtw.onrender.com"
 ]
 CORS_ALLOW_METHODS = [
     'DELETE',
