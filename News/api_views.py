@@ -184,6 +184,50 @@ class SubmissionDetailAPI(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     @swagger_auto_schema(
+        operation_id='get_submission_detail',
+        responses={
+            200: openapi.Response(
+                description="Submission details retrieved successfully",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'id': openapi.Schema(type=openapi.TYPE_INTEGER, description='The ID of the submission'),
+                        'title': openapi.Schema(type=openapi.TYPE_STRING, description='The title of the submission'),
+                        'url': openapi.Schema(type=openapi.TYPE_STRING, format='url', description='The URL of the submission (if applicable)', nullable=True),
+                        'text': openapi.Schema(type=openapi.TYPE_STRING, description='The text of the submission (if applicable)', nullable=True),
+                        'submission_type': openapi.Schema(type=openapi.TYPE_STRING, description='The type of submission', enum=['url', 'ask']),
+                        'points': openapi.Schema(type=openapi.TYPE_INTEGER, description='The total points of the submission'),
+                        'user': openapi.Schema(type=openapi.TYPE_STRING, description='The username of the submission author'),
+                        'created_at': openapi.Schema(type=openapi.TYPE_STRING, format='date-time', description='The timestamp when the submission was created'),
+                        'updated_at': openapi.Schema(type=openapi.TYPE_STRING, format='date-time', description='The timestamp when the submission was last updated'),
+                    }
+                )
+            ),
+            404: 'Submission not found'
+        }
+    )
+    def get(self, request, submission_id):
+        """
+        Retrieve details of a specific submission.
+        """
+        submission = get_object_or_404(Submission, id=submission_id)
+
+        submission_data = {
+            "id": submission.id,
+            "title": submission.title,
+            "url": submission.url,
+            "text": submission.text,
+            "submission_type": submission.submission_type,
+            "points": submission.points,
+            "user": submission.user.username,
+            "created_at": submission.created_at,
+            "updated_at": submission.updated_at,
+        }
+
+        return Response(submission_data, status=status.HTTP_200_OK)
+
+
+    @swagger_auto_schema(
         operation_id='submission_action',
         manual_parameters=[
             openapi.Parameter(

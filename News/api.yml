@@ -477,6 +477,63 @@ paths:
           description: User not found
 
   /submissions/{submission_id}/:
+    get:
+      tags: [submissions]
+      summary: Retrieve submission details
+      description: Retrieve detailed information about a specific submission by its ID.
+      parameters:
+        - name: submission_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the submission to retrieve.
+      responses:
+        '200':
+          description: Submission details retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  title:
+                    type: string
+                    example: "Example Submission Title"
+                  url:
+                    type: string
+                    format: url
+                    nullable: true
+                    example: "https://example.com"
+                    description: The URL of the submission (if applicable).
+                  text:
+                    type: string
+                    nullable: true
+                    example: "This is the content of an Ask submission."
+                    description: The text of the submission (if applicable).
+                  submission_type:
+                    type: string
+                    enum: [url, ask]
+                    example: "url"
+                    description: The type of submission.
+                  points:
+                    type: integer
+                    example: 42
+                  user:
+                    type: string
+                    example: "john_doe"
+                  created_at:
+                    type: string
+                    format: date-time
+                    example: "2024-06-06T12:00:00Z"
+                  updated_at:
+                    type: string
+                    format: date-time
+                    example: "2024-06-07T15:30:00Z"
+        '404':
+          description: Submission not found
     post:
       tags: [submissions]
       summary: Perform action on submission
